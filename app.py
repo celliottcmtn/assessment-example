@@ -230,7 +230,7 @@ st.sidebar.markdown("""
 if st.sidebar.button("🔄 Reset Assessment"):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-    st.experimental_rerun() Q2")
+    st.experimental_rerun()
     else:
         st.markdown("⬜ Q2")
         
