@@ -45,13 +45,12 @@ if st.button("✅ Submit Answer 1"):
 # -------------------
 # QUESTION 2: FACTORING
 # -------------------
-a, b = random.choice([(1, 2), (1, 3), (1, 4)])
-c, d = random.choice([(2, 3), (1, 6), (2, 5)])
-m, n = a * c, b * d
-middle = a * d + b * c
+r1, r2 = random.choice([(1, 2), (2, 3), (3, 4), (-2, -3), (-1, 4)])
+trinomial_b = r1 + r2
+trinomial_c = r1 * r2
 
 st.header("Question 2: Factoring Quadratic Equations")
-st.latex(f"x^2 + {middle}x + {m * n}")
+st.latex(f"x^2 + {trinomial_b}x + {trinomial_c}")
 
 if st.button("🔄 Need a refresher for Question 2"):
     st.markdown("""
@@ -69,14 +68,14 @@ if st.button("🔄 Need a refresher for Question 2"):
     st.image("https://mathbitsnotebook.com/Algebra1/Factoring/FACimages/FactorGCF01.png", caption="Factoring trinomials diagram")
 
 answer2 = st.text_input("Your factored expression:", key="q2")
-correct_factored = [f"(x+{a})(x+{b})", f"(x+{b})(x+{a})"]
+correct_factored = [f"(x+{r1})(x+{r2})", f"(x+{r2})(x+{r1})"]
 
 if st.button("✅ Submit Answer 2"):
     simplified = answer2.replace(" ", "")
     if any(simplified == ans.replace(" ", "") for ans in correct_factored):
         st.success("✅ Correct! Well done.")
     else:
-        st.error(f"❌ Not quite. One correct answer is (x + {a})(x + {b}).")
+        st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
 
 # -------------------
 # QUESTION 3: TRIGONOMETRY
