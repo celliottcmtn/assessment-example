@@ -1,4 +1,41 @@
-st.markdown("---")
+if st.button("✅ Submit Answer 2"):
+    simplified = answer2.replace(" ", "")
+    if any(simplified == ans.replace(" ", "") for ans in correct_factored):
+        st.success("✅ Correct! Well done.")
+        st.session_state.q2_completed = True
+        if "current_score" in st.session_state:
+            if not st.session_state.get("q2_already_scored", False):
+                st.session_state.current_score += 1
+                st.session_state.q2_already_scored = True
+        st.balloons()
+    else:
+        st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
+        
+        # Provide detailed feedback for incorrect answers
+        with st.expander("See Step-by-Step Solution"):
+            st.markdown(f"""
+            ### Solution Walkthrough:
+            
+            **Step 1:** For the trinomial `x² + {trinomial_b}x + {trinomial_c}`, find two numbers that:
+            - Multiply to give {trinomial_c}
+            - Add to give {trinomial_b}
+            
+            **Step 2:** The numbers {r1} and {r2} work because:
+            - {r1} × {r2} = {r1 * r2}
+            - {r1} + {r2} = {r1 + r2}
+            
+            **Step 3:** Write the factored form:
+            - (x + {r1})(x + {r2})
+            
+            **Check:** Multiply it out to verify:
+            - First term: x × x = x²
+            - Middle terms: x × {r2} + {r1} × x = {r2}x + {r1}x = {r1 + r2}x
+            - Last term: {r1} × {r2} = {r1 * r2}
+            
+            So (x + {r1})(x + {r2}) = x² + {trinomial_b}x + {trinomial_c} ✓
+            """)
+            
+            st.info("Try again! You can edit your answer above and resubmit.")st.markdown("---")
 
 # Add some final feedback and navigation section
 st.header("Assessment Summary")
@@ -431,45 +468,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             st.info(st.session_state.q2_ai_response)
 
 correct_factored = [f"(x+{r1})(x+{r2})", f"(x+{r2})(x+{r1})"]
-
-if st.button("✅ Submit Answer 2"):
-    simplified = answer2.replace(" ", "")
-    if any(simplified == ans.replace(" ", "") for ans in correct_factored):
-        st.success("✅ Correct! Well done.")
-        st.session_state.q2_completed = True
-        if "current_score" in st.session_state:
-            if not st.session_state.get("q2_already_scored", False):
-                st.session_state.current_score += 1
-                st.session_state.q2_already_scored = True
-        st.balloons()
-    else:
-        st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
-        
-        # Provide detailed feedback for incorrect answers
-        with st.expander("See Step-by-Step Solution"):
-            st.markdown(f"""
-            ### Solution Walkthrough:
-            
-            **Step 1:** For the trinomial `x² + {trinomial_b}x + {trinomial_c}`, find two numbers that:
-            - Multiply to give {trinomial_c}
-            - Add to give {trinomial_b}
-            
-            **Step 2:** The numbers {r1} and {r2} work because:
-            - {r1} × {r2} = {r1 * r2}
-            - {r1} + {r2} = {r1 + r2}
-            
-            **Step 3:** Write the factored form:
-            - (x + {r1})(x + {r2})
-            
-            **Check:** Multiply it out to verify:
-            - First term: x × x = x²
-            - Middle terms: x × {r2} + {r1} × x = {r2}x + {r1}x = {r1 + r2}x
-            - Last term: {r1} × {r2} = {r1 * r2}
-            
-            So (x + {r1})(x + {r2}) = x² + {trinomial_b}x + {trinomial_c} ✓
-            """)
-            
-            st.info("Try again! You can edit your answer above and resubmit.")
 
 
 # -------------------
