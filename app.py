@@ -103,9 +103,8 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
                         "content": f"Help a Grade 10 student who says: {q2_ai_input}"
                     }]
                 )
-                st.markdown(f"**AI Response:**
+            st.markdown(f"**AI Response:**\\n\\n{response.choices[0].message.content}")
 
-{response.choices[0].message.content}")
 correct_factored = [f"(x+{r1})(x+{r2})", f"(x+{r2})(x+{r1})"]
 
 if st.button("✅ Submit Answer 2"):
@@ -153,9 +152,8 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
                         "content": f"Help a Grade 10 student who says: {q3_ai_input}"
                     }]
                 )
-                st.markdown(f"**AI Response:**
+            st.markdown(f"**AI Response:**\\n\\n{response.choices[0].message.content}")
 
-{response.choices[0].message.content}")
 if st.button("✅ Submit Answer 3"):
     try:
         user_val = float(answer3)
