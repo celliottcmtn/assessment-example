@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 
 # Load the OpenAI API key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("📘 Grade 10 Math Placement Assessment")
 st.markdown("Select the best answer or enter your solution. You can click 'Need a refresher?' for help before answering.")
@@ -15,7 +15,7 @@ st.latex(r"3x - 7 = 11")
 
 if st.button("🔄 Need a refresher for Question 1"):
     with st.spinner("AI is preparing a refresher lesson..."):
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "user",
@@ -42,7 +42,7 @@ st.latex(r"x^2 + 5x + 6")
 
 if st.button("🔄 Need a refresher for Question 2"):
     with st.spinner("AI is preparing a refresher lesson..."):
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "user",
@@ -69,7 +69,7 @@ st.markdown("A right triangle has an angle A such that sin(A) = 0.6. Use your ca
 
 if st.button("🔄 Need a refresher for Question 3"):
     with st.spinner("AI is preparing a refresher lesson..."):
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "user",
