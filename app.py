@@ -35,9 +35,23 @@ if st.button("🔄 Need a refresher for Question 1"):
 
     📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/solving-linear-equations)
     """)
-    st.image("https://cdn.kastatic.org/ka-perseus-images/1bd7d6ce6f76fb2fcb1e29c373c4b5d2dca3d028.png", caption="Visual of solving linear equations")
-
+    
 answer1 = st.text_input("Your answer for x:", key="q1")
+if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_toggle"):
+    q1_ai_input = st.text_area("What would you like to ask about Question 1?", key="q1_ai_text")
+    if st.button("Ask AI about Question 1"):
+        if q1_ai_input.strip():
+            with st.spinner("Asking AI..."):
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{
+                        "role": "user",
+                        "content": f"Help a Grade 10 student who says: {q1_ai_input}"
+                    }]
+                )
+                st.markdown(f"**AI Response:**
+
+{response.choices[0].message.content}")
 if st.button("✅ Submit Answer 1"):
     try:
         if abs(float(answer1) - 3) < 0.01:
@@ -78,6 +92,21 @@ if st.button("🔄 Need a refresher for Question 2"):
     st.image("https://cdn.kastatic.org/ka-perseus-images/5ceff8a3e7416c1c798193baad3d24988a4f15f9.png", caption="Factoring x² + 5x + 6 visually")
 
 answer2 = st.text_input("Your factored expression:", key="q2")
+if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_toggle"):
+    q2_ai_input = st.text_area("What would you like to ask about Question 2?", key="q2_ai_text")
+    if st.button("Ask AI about Question 2"):
+        if q2_ai_input.strip():
+            with st.spinner("Asking AI..."):
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{
+                        "role": "user",
+                        "content": f"Help a Grade 10 student who says: {q2_ai_input}"
+                    }]
+                )
+                st.markdown(f"**AI Response:**
+
+{response.choices[0].message.content}")
 correct_factored = [f"(x+{r1})(x+{r2})", f"(x+{r2})(x+{r1})"]
 
 if st.button("✅ Submit Answer 2"):
@@ -113,6 +142,21 @@ if st.button("🔄 Need a refresher for Question 3"):
     st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png", caption="Trig ratios in a right triangle")
 
 answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
+if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_toggle"):
+    q3_ai_input = st.text_area("What would you like to ask about Question 3?", key="q3_ai_text")
+    if st.button("Ask AI about Question 3"):
+        if q3_ai_input.strip():
+            with st.spinner("Asking AI..."):
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{
+                        "role": "user",
+                        "content": f"Help a Grade 10 student who says: {q3_ai_input}"
+                    }]
+                )
+                st.markdown(f"**AI Response:**
+
+{response.choices[0].message.content}")
 if st.button("✅ Submit Answer 3"):
     try:
         user_val = float(answer3)
@@ -124,9 +168,8 @@ if st.button("✅ Submit Answer 3"):
         st.error("Please enter a numeric value.")
 
 st.markdown("---")
-st.markdown("✅ Once you've completed all three questions, you'll be given a recommendation for your placement level in math.")
 
-# Final Recommendation Button
+
 if st.button("📊 Get My Placement Recommendation"):
     score = 0
     try:
