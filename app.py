@@ -21,16 +21,21 @@ st.latex(f"{coeff}x + {const} = {rhs}")
 
 if st.button("🔄 Need a refresher for Question 1"):
     st.markdown("""
-    **How to Solve a Linear Equation (like ax + b = c):**
+    ### 📘 Refresher: Solving Linear Equations
 
-    Example: `3x + 4 = 13`
+    A linear equation like `3x + 4 = 13` can be solved in two simple steps:
 
-    **Step 1:** Subtract 4 from both sides → `3x = 9`  
-    **Step 2:** Divide both sides by 3 → `x = 3`
+    **Step 1:** Subtract 4 from both sides  
+    `3x + 4 - 4 = 13 - 4` → `3x = 9`
 
-    🔍 You're trying to get `x` alone by undoing the operations in reverse order.
+    **Step 2:** Divide both sides by 3  
+    `3x / 3 = 9 / 3` → `x = 3`
+
+    🧠 The goal is to isolate `x` by undoing the operations in reverse order.
+
+    📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/solving-linear-equations)
     """)
-    st.image("https://cdn.kastatic.org/ka-perseus-images/cb9b0c6e574ac9f9cbd65a43d86d67c3db2f2d64.png", caption="Steps for solving linear equations")
+    st.image("https://cdn.kastatic.org/ka-perseus-images/1bd7d6ce6f76fb2fcb1e29c373c4b5d2dca3d028.png", caption="Visual of solving linear equations")
 
 answer1 = st.text_input("Your answer for x:", key="q1")
 if st.button("✅ Submit Answer 1"):
@@ -56,18 +61,21 @@ st.latex(f"x^2 + {trinomial_b}x + {trinomial_c}")
 
 if st.button("🔄 Need a refresher for Question 2"):
     st.markdown("""
-    **How to Factor a Quadratic (like x² + bx + c):**
+    ### 📘 Refresher: Factoring Quadratic Expressions
 
-    Example: `x² + 5x + 6`
+    A quadratic trinomial looks like `x² + 5x + 6`. Here's how to factor it:
 
-    **Step 1:** Look for two numbers that multiply to 6 and add to 5.  
-    **Answer:** 2 and 3 → because `2 × 3 = 6` and `2 + 3 = 5`
+    **Step 1:** Find two numbers that multiply to the last number (6) and add to the middle number (5).  
+    → `2 × 3 = 6` and `2 + 3 = 5`
 
-    **Step 2:** Write the factored form: `(x + 2)(x + 3)`
+    **Step 2:** Write the factored form using those numbers:  
+    → `(x + 2)(x + 3)`
 
-    ✅ Done! Always double-check by expanding to see if it matches the original.
+    ✅ Double-check by expanding to make sure it gives the original trinomial.
+
+    📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/polynomial-factorization/factoring-quadratics-intro/v/factoring-quadratics-intro)
     """)
-    st.image("https://mathbitsnotebook.com/Algebra1/Factoring/FACimages/FactorGCF01.png", caption="Factoring trinomials diagram")
+    st.image("https://cdn.kastatic.org/ka-perseus-images/5ceff8a3e7416c1c798193baad3d24988a4f15f9.png", caption="Factoring x² + 5x + 6 visually")
 
 answer2 = st.text_input("Your factored expression:", key="q2")
 correct_factored = [f"(x+{r1})(x+{r2})", f"(x+{r2})(x+{r1})"]
@@ -90,16 +98,17 @@ st.markdown(f"A right triangle has an angle A such that sin(A) = {value}. Use yo
 
 if st.button("🔄 Need a refresher for Question 3"):
     st.markdown("""
-    **How to Find an Angle from a Sine Value:**
+    ### 📘 Refresher: Using Sine to Find Angles
 
-    Example: `sin(A) = 0.5`
+    If you know the sine of an angle, like `sin(A) = 0.5`, you can find the angle using your calculator:
 
-    **Step 1:** Use the `sin⁻¹` or `arcsin` button on your calculator.  
-    **Step 2:** Input `0.5` and press equals → You should get `30°`
+    **Step 1:** Press the `sin⁻¹` (also called `arcsin`) button  
+    **Step 2:** Enter the value → `sin⁻¹(0.5)`  
+    **Result:** `A = 30°`
 
-    🧠 This means angle A is 30 degrees.
+    🧠 This is often used in right triangles when you know the ratio of the opposite side to the hypotenuse.
 
-    📏 Use this when you know a side ratio and want to find the angle.
+    📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
     """)
     st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png", caption="Trig ratios in a right triangle")
 
@@ -116,3 +125,34 @@ if st.button("✅ Submit Answer 3"):
 
 st.markdown("---")
 st.markdown("✅ Once you've completed all three questions, you'll be given a recommendation for your placement level in math.")
+
+# Final Recommendation Button
+if st.button("📊 Get My Placement Recommendation"):
+    score = 0
+    try:
+        if abs(float(st.session_state.get("q1", "0")) - 3) < 0.01:
+            score += 1
+    except:
+        pass
+    try:
+        simplified = st.session_state.get("q2", "").replace(" ", "")
+        if any(simplified == ans.replace(" ", "") for ans in correct_factored):
+            score += 1
+    except:
+        pass
+    try:
+        user_val = float(st.session_state.get("q3", "0"))
+        if abs(user_val - angle_deg) <= 1:
+            score += 1
+    except:
+        pass
+
+    st.subheader("📘 Your Placement Recommendation:")
+    if score == 3:
+        st.success("You're ready for Grade 11 math or higher! Great work.")
+    elif score == 2:
+        st.info("You’re close! A little review of core Grade 10 topics is recommended.")
+    elif score == 1:
+        st.warning("Consider reviewing foundational Grade 10 topics before moving forward.")
+    else:
+        st.error("We recommend placement in a fundamentals review course (Grade 7–9 topics).")
