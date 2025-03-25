@@ -167,7 +167,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
-            st.info(st.session_state.q2_ai_response)import streamlit as st
+            st.info(st.session_state.q2_ai_response)
 import openai
 import random
 import math
