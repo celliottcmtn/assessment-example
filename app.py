@@ -1,4 +1,3 @@
-
 import streamlit as st
 import openai
 import random
@@ -21,7 +20,16 @@ st.header("Question 1: Solving Linear Equations")
 st.latex(f"{coeff}x + {const} = {rhs}")
 
 if st.button("🔄 Need a refresher for Question 1"):
-    st.info("To solve an equation like ax + b = c, subtract b from both sides, then divide by a.")
+    st.markdown("""
+    **How to Solve a Linear Equation (like ax + b = c):**
+
+    Example: `3x + 4 = 13`
+
+    **Step 1:** Subtract 4 from both sides → `3x = 9`  
+    **Step 2:** Divide both sides by 3 → `x = 3`
+
+    🔍 You're trying to get `x` alone by undoing the operations in reverse order.
+    """)
 
 answer1 = st.text_input("Your answer for x:", key="q1")
 if st.button("✅ Submit Answer 1"):
@@ -45,7 +53,18 @@ st.header("Question 2: Factoring Quadratic Equations")
 st.latex(f"x^2 + {middle}x + {m * n}")
 
 if st.button("🔄 Need a refresher for Question 2"):
-    st.info("To factor x² + bx + c, find two numbers that multiply to c and add to b.")
+    st.markdown("""
+    **How to Factor a Quadratic (like x² + bx + c):**
+
+    Example: `x² + 5x + 6`
+
+    **Step 1:** Look for two numbers that multiply to 6 and add to 5.  
+    **Answer:** 2 and 3 → because `2 × 3 = 6` and `2 + 3 = 5`
+
+    **Step 2:** Write the factored form: `(x + 2)(x + 3)`
+
+    ✅ Done! Always double-check by expanding to see if it matches the original.
+    """)
 
 answer2 = st.text_input("Your factored expression:", key="q2")
 correct_factored = [f"(x+{a})(x+{b})", f"(x+{b})(x+{a})"]
@@ -67,7 +86,18 @@ st.header("Question 3: Intro to Trigonometry")
 st.markdown(f"A right triangle has an angle A such that sin(A) = {value}. Use your calculator to find angle A in degrees.")
 
 if st.button("🔄 Need a refresher for Question 3"):
-    st.info("To find an angle when sin(A) = x, use the inverse sine button (sin⁻¹ or arcsin) on your calculator.")
+    st.markdown("""
+    **How to Find an Angle from a Sine Value:**
+
+    Example: `sin(A) = 0.5`
+
+    **Step 1:** Use the `sin⁻¹` or `arcsin` button on your calculator.  
+    **Step 2:** Input `0.5` and press equals → You should get `30°`
+
+    🧠 This means angle A is 30 degrees.
+
+    📏 Use this when you know a side ratio and want to find the angle.
+    """)
 
 answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
 if st.button("✅ Submit Answer 3"):
