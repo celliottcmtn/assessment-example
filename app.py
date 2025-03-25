@@ -30,7 +30,7 @@ if st.button("🔄 Need a refresher for Question 1"):
 
     🔍 You're trying to get `x` alone by undoing the operations in reverse order.
     """)
-    st.image("https://i.imgur.com/e4r2SCG.png", caption="Steps for solving linear equations")
+    st.image("https://cdn.kastatic.org/ka-perseus-images/cb9b0c6e574ac9f9cbd65a43d86d67c3db2f2d64.png", caption="Steps for solving linear equations")
 
 answer1 = st.text_input("Your answer for x:", key="q1")
 if st.button("✅ Submit Answer 1"):
@@ -66,7 +66,7 @@ if st.button("🔄 Need a refresher for Question 2"):
 
     ✅ Done! Always double-check by expanding to see if it matches the original.
     """)
-    st.image("https://i.imgur.com/wf91sZD.png", caption="Factoring trinomials diagram")
+    st.image("https://mathbitsnotebook.com/Algebra1/Factoring/FACimages/FactorGCF01.png", caption="Factoring trinomials diagram")
 
 answer2 = st.text_input("Your factored expression:", key="q2")
 correct_factored = [f"(x+{a})(x+{b})", f"(x+{b})(x+{a})"]
@@ -100,7 +100,7 @@ if st.button("🔄 Need a refresher for Question 3"):
 
     📏 Use this when you know a side ratio and want to find the angle.
     """)
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Triangle.TrigRatios.svg/320px-Triangle.TrigRatios.svg.png", caption="Trig ratios in a right triangle")
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png", caption="Trig ratios in a right triangle")
 
 answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
 if st.button("✅ Submit Answer 3"):
