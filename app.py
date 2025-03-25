@@ -45,7 +45,9 @@ if st.button("✅ Submit Answer 1"):
 # -------------------
 # QUESTION 2: FACTORING
 # -------------------
-r1, r2 = random.choice([(1, 2), (2, 3), (3, 4), (-2, -3), (-1, 4)])
+if "r1" not in st.session_state:
+    st.session_state.r1, st.session_state.r2 = random.choice([(1, 2), (2, 3), (3, 4), (-2, -3), (-1, 4)])
+r1, r2 = st.session_state.r1, st.session_state.r2
 trinomial_b = r1 + r2
 trinomial_c = r1 * r2
 
