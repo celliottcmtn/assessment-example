@@ -383,152 +383,50 @@ if "trig_function" not in st.session_state or st.session_state.get("regenerate_q
     st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
     st.session_state.regenerate_q3 = False
 
+# Replace the JavaScript calculator with Streamlit widgets
 st.header("Question 3: Intro to Trigonometry")
-st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Use your calculator to find angle A in degrees.**")
+st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Use the calculator below to find angle A in degrees.**")
 
-# Add embedded calculator for question 3
-st.markdown("### 🧮 Calculator")
+# Create a simplified Streamlit-based calculator
+st.markdown(f"### 🧮 Calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value})")
+
 calc_cols = st.columns([2, 1])
-
 with calc_cols[0]:
-    # Create a simple calculator UI 
-    st.markdown("""
-    <style>
-    .calc-btn {
-        width: 50px;
-        height: 50px;
-        margin: 5px;
-        font-size: 18px;
-    }
-    </style>
+    st.markdown("To find the angle A, we need to use the inverse trigonometric function:")
+
+    # Calculate the angle using Python directly as an example
+    if st.session_state.trig_function == "sin":
+        example_result = round(math.degrees(math.asin(st.session_state.trig_value)), 2)
+        st.code(f"import math\nangle_in_degrees = math.degrees(math.asin({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
+    elif st.session_state.trig_function == "cos":
+        example_result = round(math.degrees(math.acos(st.session_state.trig_value)), 2)
+        st.code(f"import math\nangle_in_degrees = math.degrees(math.acos({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
+    else:  # tan
+        example_result = round(math.degrees(math.atan(st.session_state.trig_value)), 2)
+        st.code(f"import math\nangle_in_degrees = math.degrees(math.atan({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
     
-    <div>
-    <script>
-    function updateCalculation(val) {
-        document.getElementById('calc-display').value += val;
-    }
+    # Interactive calculator (simplified)
+    st.markdown("#### Interactive Calculator")
     
-    function calculate() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = eval(display.value);
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
+    if st.button(f"Calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value})"):
+        st.session_state.calculated_angle = st.session_state.angle_deg
+        st.success(f"Result: {st.session_state.angle_deg}°")
     
-    function clearDisplay() {
-        document.getElementById('calc-display').value = '';
-    }
-    
-    function calculateSin() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = Math.sin(display.value * Math.PI / 180); // Convert to radians
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
-    
-    function calculateCos() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = Math.cos(display.value * Math.PI / 180); // Convert to radians
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
-    
-    function calculateTan() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = Math.tan(display.value * Math.PI / 180); // Convert to radians
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
-    
-    function calculateArcSin() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = (Math.asin(parseFloat(display.value)) * 180 / Math.PI).toFixed(2); // Convert to degrees
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
-    
-    function calculateArcCos() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = (Math.acos(parseFloat(display.value)) * 180 / Math.PI).toFixed(2); // Convert to degrees
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
-    
-    function calculateArcTan() {
-        try {
-            const display = document.getElementById('calc-display');
-            display.value = (Math.atan(parseFloat(display.value)) * 180 / Math.PI).toFixed(2); // Convert to degrees
-        } catch(e) {
-            document.getElementById('calc-display').value = "Error";
-        }
-    }
-    </script>
-    
-    <div style="width: 300px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f9f9f9;">
-        <input type="text" id="calc-display" style="width: 100%; height: 40px; margin-bottom: 10px; font-size: 18px; text-align: right;">
-        
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
-            <button class="calc-btn" onclick="clearDisplay()">C</button>
-            <button class="calc-btn" onclick="updateCalculation('(')">(</button>
-            <button class="calc-btn" onclick="updateCalculation(')')">)</button>
-            <button class="calc-btn" onclick="updateCalculation('/')">/</button>
-            
-            <button class="calc-btn" onclick="updateCalculation('7')">7</button>
-            <button class="calc-btn" onclick="updateCalculation('8')">8</button>
-            <button class="calc-btn" onclick="updateCalculation('9')">9</button>
-            <button class="calc-btn" onclick="updateCalculation('*')">×</button>
-            
-            <button class="calc-btn" onclick="updateCalculation('4')">4</button>
-            <button class="calc-btn" onclick="updateCalculation('5')">5</button>
-            <button class="calc-btn" onclick="updateCalculation('6')">6</button>
-            <button class="calc-btn" onclick="updateCalculation('-')">-</button>
-            
-            <button class="calc-btn" onclick="updateCalculation('1')">1</button>
-            <button class="calc-btn" onclick="updateCalculation('2')">2</button>
-            <button class="calc-btn" onclick="updateCalculation('3')">3</button>
-            <button class="calc-btn" onclick="updateCalculation('+')">+</button>
-            
-            <button class="calc-btn" onclick="updateCalculation('0')">0</button>
-            <button class="calc-btn" onclick="updateCalculation('.')">.</button>
-            <button class="calc-btn" onclick="calculate()">=</button>
-            <button class="calc-btn" onclick="updateCalculation('**')">^</button>
-        </div>
-        
-        <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
-            <button class="calc-btn" onclick="calculateSin()">sin</button>
-            <button class="calc-btn" onclick="calculateCos()">cos</button>
-            <button class="calc-btn" onclick="calculateTan()">tan</button>
-            
-            <button class="calc-btn" onclick="calculateArcSin()">sin⁻¹</button>
-            <button class="calc-btn" onclick="calculateArcCos()">cos⁻¹</button>
-            <button class="calc-btn" onclick="calculateArcTan()">tan⁻¹</button>
-        </div>
-    </div>
-    </div>
-    """, unsafe_allow_html=True)
+    if "calculated_angle" in st.session_state:
+        st.info(f"You can use this value as your answer: {st.session_state.calculated_angle}°")
 
 with calc_cols[1]:
-    st.markdown("""
-    #### Calculator Instructions
+    st.markdown(f"""
+    #### Calculator Tips
     
-    1. Enter the value ({trig_value})
-    2. Press the {trig_function}⁻¹ button
-    3. The result is the angle in degrees
+    On a scientific calculator:
     
-    **Tip:** For this problem, you need to use the inverse trigonometric function (find an angle from its {trig_function} value).
-    """.format(trig_value=st.session_state.trig_value, trig_function=st.session_state.trig_function))
+    1. Enter {st.session_state.trig_value}
+    2. Press the {st.session_state.trig_function}⁻¹ button
+    3. Read the angle in degrees
+    
+    **Note:** Make sure your calculator is in degree mode, not radian mode.
+    """)
 
 refresher_col3, practice_col3 = st.columns([1, 1])
 with refresher_col3:
