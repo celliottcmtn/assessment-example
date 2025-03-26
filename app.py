@@ -70,7 +70,7 @@ st.sidebar.markdown("""
 if st.sidebar.button("🔄 Reset Assessment"):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-    st.experimental_rerun()
+    st.rerun()
 
 # PART 2: QUESTION 1 - LINEAR EQUATION
 # Function to generate a new linear equation
@@ -191,7 +191,7 @@ if st.button("✅ Submit Answer 1"):
                 # Set regenerate flag to true to get a new question
                 st.session_state.regenerate_q1 = True
                 st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
-                st.experimental_rerun()
+                st.rerun()
     except ValueError:
         st.error("Please enter a numeric value.")
 
@@ -345,7 +345,7 @@ if st.button("✅ Submit Answer 2"):
             # Set regenerate flag to true to get a new question
             st.session_state.regenerate_q2 = True
             st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
-            st.experimental_rerun()
+            st.rerun()
 
 st.markdown("---")
 
@@ -520,7 +520,7 @@ if st.button("✅ Submit Answer 3"):
 # Set regenerate flag to true to get a new question
                 st.session_state.regenerate_q3 = True
                 st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
-                st.experimental_rerun()
+                st.rerun()
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
 
@@ -688,4 +688,4 @@ if st.session_state.q3_completed:
                 st.session_state.regenerate_q1 = True
                 st.session_state.regenerate_q2 = True
                 st.session_state.regenerate_q3 = True
-                st.experimental_rerun()
+                st.rerun()
