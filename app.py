@@ -392,30 +392,19 @@ To solve this problem:
 3. Use the online calculator linked below (make sure it's in degree mode)
 """)
 
-calc_cols = st.columns([2, 1])
-with calc_cols[0]:
-    st.markdown("#### Using Python's Math Library")
-    if st.session_state.trig_function == "sin":
-        st.code(f"import math\nresult = math.degrees(math.asin({st.session_state.trig_value}))\nprint(f\"Angle = {round(math.degrees(math.asin(st.session_state.trig_value)), 2)}°\")")
-    elif st.session_state.trig_function == "cos":
-        st.code(f"import math\nresult = math.degrees(math.acos({st.session_state.trig_value}))\nprint(f\"Angle = {round(math.degrees(math.acos(st.session_state.trig_value)), 2)}°\")")
-    else:  # tan
-        st.code(f"import math\nresult = math.degrees(math.atan({st.session_state.trig_value}))\nprint(f\"Angle = {round(math.degrees(math.atan(st.session_state.trig_value)), 2)}°\")")
+st.markdown("#### Online Calculator Tools")
+st.markdown("""
+[Desmos Scientific Calculator](https://www.desmos.com/scientific)
 
-with calc_cols[1]:
-    st.markdown("#### Online Calculator")
-    st.markdown("""
-    [Desmos Scientific Calculator](https://www.desmos.com/scientific)
-    
-    [GeoGebra Scientific Calculator](https://www.geogebra.org/scientific)
-    
-    [web2.0calc Scientific Calculator](https://web2.0calc.com/)
-    """)
-    
-    # Option to reveal the answer
-    if st.button("Show me the calculation"):
-        st.session_state.calculated_angle = st.session_state.angle_deg
-        st.success(f"Result: {st.session_state.angle_deg}°")
+[GeoGebra Scientific Calculator](https://www.geogebra.org/scientific)
+
+[web2.0calc Scientific Calculator](https://web2.0calc.com/)
+""")
+
+# Option to reveal the answer
+if st.button("Show me the calculation result"):
+    st.session_state.calculated_angle = st.session_state.angle_deg
+    st.success(f"Result: {st.session_state.angle_deg}°")
 
 if "calculated_angle" in st.session_state:
     st.info(f"You can use this value as your answer: {st.session_state.calculated_angle}°")
@@ -546,7 +535,7 @@ if st.button("✅ Submit Answer 3"):
                 else:
                     st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
     except ValueError:
-        st.error("Please enter a numeric value for the angle.")        
+        st.error("Please enter a numeric value for the angle.")     
         
 # Add assessment summary below question 3
 # -------------------
