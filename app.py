@@ -22,6 +22,14 @@ if "q2_completed" not in st.session_state:
 if "q3_completed" not in st.session_state:
     st.session_state.q3_completed = False
 
+# Track attempts for each question
+if "q1_attempts" not in st.session_state:
+    st.session_state.q1_attempts = 0
+if "q2_attempts" not in st.session_state:
+    st.session_state.q2_attempts = 0
+if "q3_attempts" not in st.session_state:
+    st.session_state.q3_attempts = 0
+
 # Display progress indicators
 with col1:
     if st.session_state.q1_completed:
@@ -66,11 +74,18 @@ if st.sidebar.button("🔄 Reset Assessment"):
 # -------------------
 # QUESTION 1: LINEAR EQUATION
 # -------------------
-# Initialize random values in session state to keep them consistent across reruns
-if "coeff" not in st.session_state:
-    st.session_state.coeff = random.randint(2, 5)
-    st.session_state.const = random.randint(1, 10)
-    st.session_state.rhs = st.session_state.coeff * 3 + st.session_state.const
+# Function to generate a new linear equation
+def generate_linear_equation():
+    coeff = random.randint(2, 8)
+    solution = random.randint(-5, 10)  # Random solution value
+    const = random.randint(-10, 15)
+    rhs = coeff * solution + const
+    return coeff, const, rhs, solution
+
+# Initialize random values in session state or regenerate when needed
+if "coeff" not in st.session_state or st.session_state.get("regenerate_q1", False):
+    st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
+    st.session_state.regenerate_q1 = False
 
 st.header("Question 1: Solving Linear Equations")
 st.markdown(f"**Solve for x in the equation below:**")
@@ -147,16 +162,17 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
 
 if st.button("✅ Submit Answer 1"):
     try:
-        if abs(float(answer1) - 3) < 0.01:
-            st.success("Correct! 🎉 Great job solving for x.")
+        st.session_state.q1_attempts += 1
+        if abs(float(answer1) - st.session_state.q1_solution) < 0.01:
+            st.success(f"Correct! 🎉 Great job solving for x = {st.session_state.q1_solution}.")
             st.session_state.q1_completed = True
             if "current_score" in st.session_state:
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
-            st.balloons()
+            st.write("🎆") # Small firework celebration
         else:
-            st.error(f"Oops! That's not quite right. The correct answer is 3.")
+            st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
             
             # Provide detailed feedback for incorrect answers
             with st.expander("See Step-by-Step Solution"):
@@ -169,174 +185,126 @@ if st.button("✅ Submit Answer 1"):
                 
                 **Step 2:** Divide both sides by {st.session_state.coeff}  
                 `{st.session_state.coeff}x ÷ {st.session_state.coeff} = {st.session_state.rhs - st.session_state.const} ÷ {st.session_state.coeff}`  
-                `x = 3`
+                `x = {st.session_state.q1_solution}`
                 
-                **Check:** Substitute x = 3 back into the original equation  
-                `{st.session_state.coeff} × 3 + {st.session_state.const} = {st.session_state.coeff * 3 + st.session_state.const}`  
-                `{st.session_state.coeff * 3 + st.session_state.const} = {st.session_state.rhs}` ✓
+                **Check:** Substitute x = {st.session_state.q1_solution} back into the original equation  
+                `{st.session_state.coeff} × {st.session_state.q1_solution} + {st.session_state.const} = {st.session_state.coeff * st.session_state.q1_solution + st.session_state.const}`  
+                `{st.session_state.coeff * st.session_state.q1_solution + st.session_state.const} = {st.session_state.rhs}` ✓
                 """)
                 
-                st.info("Try again! You can edit your answer above and resubmit.")
+                # Add button for new question
+                if st.button("Try a new question", key="new_q1"):
+                    st.session_state.regenerate_q1 = True
+                    st.experimental_rerun()
+                else:
+                    st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
     except ValueError:
         st.error("Please enter a numeric value.")
 
+# -------------------
+# QUESTION 3: TRIGONOMETRY
+# -------------------
+# Function to generate a new trigonometry problem
+def generate_trig_problem():
+    # Random trig function (sin, cos, or tan)
+    trig_function = random.choice(["sin", "cos", "tan"])
+    
+    # Generate appropriate values based on the function
+    if trig_function == "sin":
+        trig_value = round(random.uniform(0.1, 0.95), 2)
+        angle_deg = round(math.degrees(math.asin(trig_value)), 2)
+    elif trig_function == "cos":
+        trig_value = round(random.uniform(0.1, 0.95), 2)
+        angle_deg = round(math.degrees(math.acos(trig_value)), 2)
+    else:  # tan
+        trig_value = round(random.uniform(0.1, 2.0), 2)
+        angle_deg = round(math.degrees(math.atan(trig_value)), 2)
+    
+    return trig_function, trig_value, angle_deg
+
+# Initialize or regenerate trigonometry problem
+if "trig_function" not in st.session_state or st.session_state.get("regenerate_q3", False):
+    st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
+    st.session_state.regenerate_q3 = False
+
+st.header("Question 3: Intro to Trigonometry")
+st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Use your calculator to find angle A in degrees.**")
+
+refresher_col3, practice_col3 = st.columns([1, 1])
+with refresher_col3:
+    if st.button("🔄 Need a refresher for Question 3", key="refresh_q3"):
+        st.markdown(f"""
+        ### 📘 Refresher: Using {st.session_state.trig_function.capitalize()} to Find Angles
+
+        If you know the {st.session_state.trig_function} of an angle, like `{st.session_state.trig_function}(A) = {st.session_state.trig_value}`, you can find the angle using your calculator:
+
+        **Step 1:** Press the `{st.session_state.trig_function}⁻¹` (also called `arc{st.session_state.trig_function}`) button  
+        **Step 2:** Enter the value → `{st.session_state.trig_function}⁻¹({st.session_state.trig_value})`  
+        **Result:** `A = {st.session_state.angle_deg}°`
+
+        🧠 This is often used in right triangles when you know the ratio of sides.
+
+        📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
+        """)
+        # Using a placeholder image instead of external URL for better compatibility with Streamlit
+        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
+
+with practice_col3:
+    if st.button("🎮 Practice Similar Problem", key="practice_q3"):
+        # Generate a practice trig problem
+        practice_trig_function = random.choice(["sin", "cos", "tan"])
+        
+        if practice_trig_function == "sin":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
+        elif practice_trig_function == "cos":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
+        else:  # tan
+            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
+            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
+        
+        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
+        
+        with st.expander("See Solution"):
+            st.markdown(f"""
+            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
+            
+            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}⁻¹({practice_trig_value})
+            
+            **Step 2:** Calculate using calculator: B = {practice_angle}°
+            
+            On most scientific calculators, press the `{practice_trig_function}⁻¹` button followed by {practice_
+
 st.markdown("---")
-
-# Add some final feedback and navigation section
-st.header("Assessment Summary")
-
-# Create tabs for different sections of the summary
-summary_tab, tips_tab, next_steps_tab = st.tabs(["Summary", "Study Tips", "Next Steps"])
-
-with summary_tab:
-    completed_count = sum([st.session_state.get("q1_completed", False), 
-                          st.session_state.get("q2_completed", False), 
-                          st.session_state.get("q3_completed", False)])
-    
-    if completed_count == 0:
-        st.info("You haven't completed any questions yet. Try answering the questions above!")
-    else:
-        st.success(f"You've completed {completed_count} out of 3 questions!")
-        
-        # Show progress on specific topics
-        st.subheader("Topic Mastery")
-        topic_cols = st.columns(3)
-        
-        with topic_cols[0]:
-            if st.session_state.get("q1_completed", False):
-                st.markdown("📈 **Linear Equations**: Mastered ✓")
-            else:
-                st.markdown("📉 **Linear Equations**: Not yet mastered")
-                
-        with topic_cols[1]:
-            if st.session_state.get("q2_completed", False):
-                st.markdown("📈 **Factoring**: Mastered ✓") 
-            else:
-                st.markdown("📉 **Factoring**: Not yet mastered")
-                
-        with topic_cols[2]:
-            if st.session_state.get("q3_completed", False):
-                st.markdown("📈 **Trigonometry**: Mastered ✓")
-            else:
-                st.markdown("📉 **Trigonometry**: Not yet mastered")
-
-with tips_tab:
-    st.markdown("""
-    ### 📚 Study Tips for Grade 10 Math
-    
-    1. **Practice Regularly**: Math skills improve with consistent practice
-    2. **Use Visual Aids**: Draw diagrams to help understand problems
-    3. **Learn Step-by-Step**: Break down complex problems into smaller steps
-    4. **Check Your Work**: Always verify your answers
-    5. **Study Groups**: Work with classmates to discuss challenging topics
-    6. **Online Resources**: Use Khan Academy and other free resources
-    7. **Ask for Help**: Don't hesitate to ask your teacher when you're stuck
-    """)
-    
-with next_steps_tab:
-    st.markdown("""
-    ### 🚀 Next Steps
-    
-    Based on your performance in this assessment:
-    
-    1. **Review incorrect answers** using the step-by-step solutions
-    2. **Practice similar problems** to strengthen your understanding
-    3. **Use the AI tutor** to get personalized help on challenging concepts
-    4. **Take the assessment again** after reviewing to see your improvement
-    """)
-    
-    if st.button("📊 Get My Placement Recommendation", key="final_rec"):
-        score = st.session_state.current_score
-        st.subheader("📘 Your Placement Recommendation:")
-        if score == 3:
-            st.success("You're ready for Grade 11 math or higher! Great work.")
-            st.balloons()
-        elif score == 2:
-            # Track which question was incorrect
-            missed_topics = []
-            try:
-                if not (abs(float(st.session_state.get("q1", "0")) - 3) < 0.01):
-                    missed_topics.append("Linear Equations")
-            except:
-                missed_topics.append("Linear Equations")
-                
-            try:
-                simplified = st.session_state.get("q2", "").replace(" ", "")
-                if not any(simplified == ans.replace(" ", "") for ans in correct_factored):
-                    missed_topics.append("Factoring Quadratics")
-            except:
-                missed_topics.append("Factoring Quadratics")
-            
-            try:
-                user_val = float(st.session_state.get("q3", "0"))
-                if not (abs(user_val - st.session_state.angle_deg) <= 1):
-                    missed_topics.append("Trigonometry")
-            except:
-                missed_topics.append("Trigonometry")
-                
-            topic_to_review = ", ".join(missed_topics)
-            st.info(f"You can proceed to Grade 11 math, but should first review: {topic_to_review}. Your understanding of other topics is strong!")
-            
-            # Provide specific resources for review
-            with st.expander("Resources for Review"):
-                for topic in missed_topics:
-                    if topic == "Linear Equations":
-                        st.markdown("""
-                        ### Linear Equations Resources
-                        - [Khan Academy: Solving Linear Equations](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities)
-                        - Practice with isolating variables and solving step-by-step
-                        """)
-                    elif topic == "Factoring Quadratics":
-                        st.markdown("""
-                        ### Factoring Quadratics Resources
-                        - [Khan Academy: Factoring Quadratics](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring)
-                        - Try writing out all pairs of factors for the constant term
-                        """)
-                    elif topic == "Trigonometry":
-                        st.markdown("""
-                        ### Trigonometry Resources
-                        - [Khan Academy: Basic Trigonometry](https://www.khanacademy.org/math/trigonometry/trigonometry-right-triangles)
-                        - Practice using your calculator's inverse trigonometric functions
-                        """)
-        elif score == 1:
-            st.warning("Consider reviewing foundational Grade 10 topics before moving forward.")
-            
-            # Show which question was correct
-            correct_question = None
-            try:
-                if abs(float(st.session_state.get("q1", "0")) - 3) < 0.01:
-                    correct_question = "Linear Equations"
-            except:
-                pass
-                
-            try:
-                simplified = st.session_state.get("q2", "").replace(" ", "")
-                if any(simplified == ans.replace(" ", "") for ans in correct_factored):
-                    correct_question = "Factoring Quadratics"
-            except:
-                pass
-                
-            try:
-                user_val = float(st.session_state.get("q3", "0"))
-                if abs(user_val - st.session_state.angle_deg) <= 1:
-                    correct_question = "Trigonometry"
-            except:
-                pass
-                
-            if correct_question:
-                st.markdown(f"You demonstrated understanding of **{correct_question}**. Focus on strengthening the other areas.")
-            
-        else:
-            st.error("We recommend placement in a fundamentals review course (Grade 7–9 topics).")
 
 # -------------------
 # QUESTION 2: FACTORING
 # -------------------
-if "r1" not in st.session_state:
-    st.session_state.r1, st.session_state.r2 = random.choice([(1, 2), (2, 3), (3, 4), (-2, -3), (-1, 4)])
-r1, r2 = st.session_state.r1, st.session_state.r2
-trinomial_b = r1 + r2
-trinomial_c = r1 * r2
+# Function to generate a new factoring problem
+def generate_factoring_problem():
+    # Generate factors with more variety
+    factor_options = [
+        (1, 2), (1, 3), (1, 4), (1, 5), (1, 6),
+        (2, 3), (2, 5), (2, 7),
+        (3, 4), (3, 5),
+        (-1, 2), (-1, 3), (-1, 4), (-1, 5),
+        (-2, 3), (-2, 5), (-3, 2), (-3, 4)
+    ]
+    r1, r2 = random.choice(factor_options)
+    trinomial_b = r1 + r2
+    trinomial_c = r1 * r2
+    return r1, r2, trinomial_b, trinomial_c
+
+# Initialize or regenerate factoring problem
+if "r1" not in st.session_state or st.session_state.get("regenerate_q2", False):
+    st.session_state.r1, st.session_state.r2, trinomial_b, trinomial_c = generate_factoring_problem()
+    st.session_state.trinomial_b = trinomial_b
+    st.session_state.trinomial_c = trinomial_c
+    st.session_state.regenerate_q2 = False
+else:
+    trinomial_b = st.session_state.trinomial_b
+    trinomial_c = st.session_state.trinomial_c
 
 st.header("Question 2: Factoring Quadratic Equations")
 st.markdown(f"**Factor the quadratic expression below:**")
@@ -387,7 +355,8 @@ with practice_col2:
 
 answer2 = st.text_input("Your factored expression:", key="q2")
 
-# Define correct_factored before using it
+# Define correct factored answers for this problem
+r1, r2 = st.session_state.r1, st.session_state.r2
 correct_factored = [f"(x+{r1})(x+{r2})", f"(x+{r2})(x+{r1})"]
 
 # Improved AI tutor section for Question 2
@@ -419,6 +388,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             st.info(st.session_state.q2_ai_response)
 
 if st.button("✅ Submit Answer 2"):
+    st.session_state.q2_attempts += 1
     simplified = answer2.replace(" ", "")
     if any(simplified == ans.replace(" ", "") for ans in correct_factored):
         st.success("✅ Correct! Well done.")
@@ -455,117 +425,9 @@ if st.button("✅ Submit Answer 2"):
             So (x + {r1})(x + {r2}) = x² + {trinomial_b}x + {trinomial_c} ✓
             """)
             
-            st.info("Try again! You can edit your answer above and resubmit.")
-
-# -------------------
-# QUESTION 3: TRIGONOMETRY
-# -------------------
-if "trig_value" not in st.session_state:
-    st.session_state.trig_value = round(random.uniform(0.3, 0.9), 2)
-    st.session_state.angle_deg = round(math.degrees(math.asin(st.session_state.trig_value)), 2)
-
-st.header("Question 3: Intro to Trigonometry")
-st.markdown(f"**A right triangle has an angle A such that sin(A) = {st.session_state.trig_value}. Use your calculator to find angle A in degrees.**")
-
-refresher_col3, practice_col3 = st.columns([1, 1])
-with refresher_col3:
-    if st.button("🔄 Need a refresher for Question 3", key="refresh_q3"):
-        st.markdown("""
-        ### 📘 Refresher: Using Sine to Find Angles
-
-        If you know the sine of an angle, like `sin(A) = 0.5`, you can find the angle using your calculator:
-
-        **Step 1:** Press the `sin⁻¹` (also called `arcsin`) button  
-        **Step 2:** Enter the value → `sin⁻¹(0.5)`  
-        **Result:** `A = 30°`
-
-        🧠 This is often used in right triangles when you know the ratio of the opposite side to the hypotenuse.
-
-        📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
-        """)
-        # Using a placeholder image instead of external URL for better compatibility with Streamlit
-        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
-
-with practice_col3:
-    if st.button("🎮 Practice Similar Problem", key="practice_q3"):
-        practice_trig_value = round(random.uniform(0.4, 0.8), 2)
-        practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
-        
-        st.markdown(f"**Practice Problem:** Find angle B in degrees where sin(B) = {practice_trig_value}")
-        
-        with st.expander("See Solution"):
-            st.markdown(f"""
-            To find angle B when sin(B) = {practice_trig_value}:
-            
-            **Step 1:** Use the inverse sine function: B = sin⁻¹({practice_trig_value})
-            
-            **Step 2:** Calculate using calculator: B = {practice_angle}°
-            
-            On most scientific calculators, press the `sin⁻¹` button followed by {practice_trig_value}
-            """)
-
-answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
-
-# Improved AI tutor section for Question 3
-if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_toggle"):
-    st.info("You can ask questions like 'How do I find an angle from its sine?' or 'What buttons do I press on my calculator?'")
-    q3_ai_input = st.text_area("What would you like to ask about Question 3?", key="q3_ai_text")
-    
-    if st.button("Ask AI about Question 3"):
-        if q3_ai_input.strip():
-            with st.spinner("Asking AI tutor for help..."):
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are a helpful math tutor for a Grade 10 student. Provide clear, step-by-step guidance without giving away the complete answer. Use encouraging language and scaffold your explanation so the student understands the process. Keep explanations under 150 words, use simple language, and focus on building understanding rather than just the solution."
-                        },
-                        {
-                            "role": "user",
-                            "content": f"I'm trying to find the angle A in degrees when sin(A) = {st.session_state.trig_value}. {q3_ai_input}"
-                        }
-                    ]
-                )
-                # Store AI response in session state
-                st.session_state.q3_ai_response = response.choices[0].message.content
-            
-            # Display the response from session state in a nicer format
-            st.markdown("### 👨‍🏫 AI Tutor Help")
-            st.info(st.session_state.q3_ai_response)
-
-if st.button("✅ Submit Answer 3"):
-    try:
-        user_val = float(answer3)
-        if abs(user_val - st.session_state.angle_deg) <= 1:
-            st.success(f"✅ Correct! sin⁻¹({st.session_state.trig_value}) ≈ {st.session_state.angle_deg}°")
-            st.session_state.q3_completed = True
-            if "current_score" in st.session_state:
-                if not st.session_state.get("q3_already_scored", False):
-                    st.session_state.current_score += 1
-                    st.session_state.q3_already_scored = True
-            st.balloons()
-        else:
-            st.error(f"❌ That's not quite right. The correct answer is approximately {st.session_state.angle_deg}°.")
-            
-            # Provide detailed feedback for incorrect answers
-            with st.expander("See Step-by-Step Solution"):
-                st.markdown(f"""
-                ### Solution Walkthrough:
-                
-                **Step 1:** We know that sin(A) = {st.session_state.trig_value}
-                
-                **Step 2:** To find angle A, use the inverse sine function (sin⁻¹ or arcsin):  
-                A = sin⁻¹({st.session_state.trig_value})
-                
-                **Step 3:** Calculate using a calculator:  
-                A = {st.session_state.angle_deg}°
-                
-                **Verification:** If sin(A) = {st.session_state.trig_value}, then A = sin⁻¹({st.session_state.trig_value}) = {st.session_state.angle_deg}°
-                
-                > 📌 **Tip:** On most scientific calculators, find angle A by pressing the `sin⁻¹` button (sometimes labeled as `arcsin` or `asin`), then entering {st.session_state.trig_value}.
-                """)
-                
-                st.info("Try again! You can edit your answer above and resubmit.")
-    except ValueError:
-        st.error("Please enter a numeric value.")
+            # Add button for new question
+            if st.button("Try a new question", key="new_q2"):
+                st.session_state.regenerate_q2 = True
+                st.experimental_rerun()
+            else:
+                st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
