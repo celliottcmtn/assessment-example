@@ -109,7 +109,6 @@ with refresher_col1:
 
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/solving-linear-equations)
         """)
-
 with practice_col1:
     if st.button("🎮 Practice Similar Problem", key="practice_q1"):
         practice_coeff = random.randint(2, 5)
@@ -311,7 +310,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q2_ai_response)
-
 if st.button("✅ Submit Answer 2"):
     st.session_state.q2_attempts += 1
     simplified = answer2.replace(" ", "")
@@ -383,9 +381,8 @@ if "trig_function" not in st.session_state or st.session_state.get("regenerate_q
     st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
     st.session_state.regenerate_q3 = False
 
-# Replace the JavaScript calculator with Streamlit widgets
 st.header("Question 3: Intro to Trigonometry")
-st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Use the calculator below to find angle A in degrees.**")
+st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Find angle A in degrees.**")
 
 # Create a simplified Streamlit-based calculator
 st.markdown(f"### 🧮 Calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value})")
@@ -394,7 +391,7 @@ calc_cols = st.columns([2, 1])
 with calc_cols[0]:
     st.markdown("To find the angle A, we need to use the inverse trigonometric function:")
 
-    # Calculate the angle using Python directly as an example
+    # Calculate the angle using Python directly and show the result
     if st.session_state.trig_function == "sin":
         example_result = round(math.degrees(math.asin(st.session_state.trig_value)), 2)
         st.code(f"import math\nangle_in_degrees = math.degrees(math.asin({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
@@ -405,7 +402,7 @@ with calc_cols[0]:
         example_result = round(math.degrees(math.atan(st.session_state.trig_value)), 2)
         st.code(f"import math\nangle_in_degrees = math.degrees(math.atan({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
     
-    # Interactive calculator (simplified)
+    # Add a simple streamlit calculator
     st.markdown("#### Interactive Calculator")
     
     if st.button(f"Calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value})"):
@@ -446,7 +443,6 @@ with refresher_col3:
         """)
         # Using a placeholder image instead of external URL for better compatibility with Streamlit
         st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
-
 with practice_col3:
     if st.button("🎮 Practice Similar Problem", key="practice_q3"):
         # Generate a practice trig problem
@@ -693,4 +689,4 @@ with next_steps_tab:
                 st.session_state.regenerate_q1 = True
                 st.session_state.regenerate_q2 = True
                 st.session_state.regenerate_q3 = True
-                st.experimental_rerun()                                        
+                st.experimental_rerun()
