@@ -86,7 +86,6 @@ def generate_linear_equation():
 if "coeff" not in st.session_state or st.session_state.get("regenerate_q1", False):
     st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
     st.session_state.regenerate_q1 = False
-
 st.header("Question 1: Solving Linear Equations")
 st.markdown(f"**Solve for x in the equation below:**")
 st.latex(f"{st.session_state.coeff}x + {st.session_state.const} = {st.session_state.rhs}")
@@ -109,6 +108,7 @@ with refresher_col1:
 
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/solving-linear-equations)
         """)
+
 with practice_col1:
     if st.button("🎮 Practice Similar Problem", key="practice_q1"):
         practice_coeff = random.randint(2, 5)
@@ -158,7 +158,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q1_ai_response)
-
 if st.button("✅ Submit Answer 1"):
     try:
         st.session_state.q1_attempts += 1
@@ -169,7 +168,8 @@ if st.button("✅ Submit Answer 1"):
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
-            st.write("🎆") # Small firework celebration
+            # Small celebration without animation
+            st.write("🎆") 
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
             
@@ -199,6 +199,8 @@ if st.button("✅ Submit Answer 1"):
                     st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
     except ValueError:
         st.error("Please enter a numeric value.")
+
+st.markdown("---")
 
 # -------------------
 # QUESTION 2: FACTORING
@@ -231,7 +233,6 @@ else:
 st.header("Question 2: Factoring Quadratic Equations")
 st.markdown(f"**Factor the quadratic expression below:**")
 st.latex(f"x^2 + {trinomial_b}x + {trinomial_c}")
-
 refresher_col2, practice_col2 = st.columns([1, 1])
 with refresher_col2:
     if st.button("🔄 Need a refresher for Question 2", key="refresh_q2"):
@@ -310,6 +311,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q2_ai_response)
+
 if st.button("✅ Submit Answer 2"):
     st.session_state.q2_attempts += 1
     simplified = answer2.replace(" ", "")
@@ -320,7 +322,8 @@ if st.button("✅ Submit Answer 2"):
             if not st.session_state.get("q2_already_scored", False):
                 st.session_state.current_score += 1
                 st.session_state.q2_already_scored = True
-        st.balloons()
+        # Removed balloons() call here
+        st.write("🎆") # Small firework celebration instead
     else:
         st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
         
@@ -355,6 +358,8 @@ if st.button("✅ Submit Answer 2"):
             else:
                 st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
 
+st.markdown("---")
+
 # -------------------
 # QUESTION 3: TRIGONOMETRY
 # -------------------
@@ -380,7 +385,6 @@ def generate_trig_problem():
 if "trig_function" not in st.session_state or st.session_state.get("regenerate_q3", False):
     st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
     st.session_state.regenerate_q3 = False
-
 st.header("Question 3: Intro to Trigonometry")
 st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Find angle A in degrees.**")
 
@@ -495,7 +499,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q3_ai_response)
-
 if st.button("✅ Submit Answer 3"):
     try:
         st.session_state.q3_attempts += 1
@@ -535,59 +538,99 @@ if st.button("✅ Submit Answer 3"):
                 else:
                     st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
     except ValueError:
-        st.error("Please enter a numeric value for the angle.")     
-        
-# Add assessment summary below question 3
+        st.error("Please enter a numeric value for the angle.")
+
 # -------------------
 # ASSESSMENT SUMMARY
 # -------------------
-
+st.markdown("---")
 st.header("Assessment Summary")
 
-# Create tabs for different sections of the summary
-summary_tab, tips_tab, next_steps_tab = st.tabs(["Summary", "Study Tips", "Next Steps"])
+# Calculate the final score and progress information
+completed_count = sum([st.session_state.get("q1_completed", False), 
+                      st.session_state.get("q2_completed", False), 
+                      st.session_state.get("q3_completed", False)])
+score = st.session_state.current_score
 
-with summary_tab:
-    completed_count = sum([st.session_state.get("q1_completed", False), 
-                          st.session_state.get("q2_completed", False), 
-                          st.session_state.get("q3_completed", False)])
+# Display overall assessment result first
+st.subheader("📊 Your Placement Recommendation:")
+if score == 3:
+    st.success("You're ready for Grade 11 math or higher! Great work.")
+    st.write("🎆") # Small firework celebration
+elif score == 2:
+    # Track which question was incorrect
+    missed_topics = []
     
-    if completed_count == 0:
-        st.info("You haven't completed any questions yet. Try answering the questions above!")
-    else:
-        st.success(f"You've completed {completed_count} out of 3 questions!")
+    # Check which questions were missed
+    if not st.session_state.get("q1_completed", False):
+        missed_topics.append("Linear Equations")
+    if not st.session_state.get("q2_completed", False):
+        missed_topics.append("Factoring Quadratics")
+    if not st.session_state.get("q3_completed", False):
+        missed_topics.append("Trigonometry")
         
-        # Show attempts information
-        st.subheader("Attempts Information")
-        st.markdown(f"""
-        - Question 1: {st.session_state.get("q1_attempts", 0)} attempt(s)
-        - Question 2: {st.session_state.get("q2_attempts", 0)} attempt(s)
-        - Question 3: {st.session_state.get("q3_attempts", 0)} attempt(s)
-        """)
+    topic_to_review = ", ".join(missed_topics)
+    st.info(f"You can proceed to Grade 11 math, but should first review: {topic_to_review}. Your understanding of other topics is strong!")
+elif score == 1:
+    st.warning("Consider reviewing foundational Grade 10 topics before moving forward.")
+    
+    # Show which question was correct
+    correct_topic = None
+    if st.session_state.get("q1_completed", False):
+        correct_topic = "Linear Equations"
+    elif st.session_state.get("q2_completed", False):
+        correct_topic = "Factoring Quadratics"
+    elif st.session_state.get("q3_completed", False):
+        correct_topic = "Trigonometry"
         
-        # Show progress on specific topics
-        st.subheader("Topic Mastery")
-        topic_cols = st.columns(3)
-        
-        with topic_cols[0]:
-            if st.session_state.get("q1_completed", False):
-                st.markdown("📈 **Linear Equations**: Mastered ✓")
-            else:
-                st.markdown("📉 **Linear Equations**: Not yet mastered")
-                
-        with topic_cols[1]:
-            if st.session_state.get("q2_completed", False):
-                st.markdown("📈 **Factoring**: Mastered ✓") 
-            else:
-                st.markdown("📉 **Factoring**: Not yet mastered")
-                
-        with topic_cols[2]:
-            if st.session_state.get("q3_completed", False):
-                st.markdown("📈 **Trigonometry**: Mastered ✓")
-            else:
-                st.markdown("📉 **Trigonometry**: Not yet mastered")
+    if correct_topic:
+        st.markdown(f"You demonstrated understanding of **{correct_topic}**. Focus on strengthening the other areas.")
+else:
+    st.error("We recommend placement in a fundamentals review course (Grade 7–9 topics).")
 
-with tips_tab:
+# Show detailed assessment information
+st.markdown("### Assessment Details")
+
+# Show progress information
+if completed_count == 0:
+    st.info("You haven't completed any questions yet. Try answering the questions above!")
+else:
+    st.success(f"You've completed {completed_count} out of 3 questions!")
+    
+    # Show attempts information
+    st.markdown("#### Attempts Information")
+    st.markdown(f"""
+    - Question 1: {st.session_state.get("q1_attempts", 0)} attempt(s)
+    - Question 2: {st.session_state.get("q2_attempts", 0)} attempt(s)
+    - Question 3: {st.session_state.get("q3_attempts", 0)} attempt(s)
+    """)
+    
+    # Show progress on specific topics
+    st.markdown("#### Topic Mastery")
+    topic_cols = st.columns(3)
+    
+    with topic_cols[0]:
+        if st.session_state.get("q1_completed", False):
+            st.markdown("📈 **Linear Equations**: Mastered ✓")
+        else:
+            st.markdown("📉 **Linear Equations**: Not yet mastered")
+            
+    with topic_cols[1]:
+        if st.session_state.get("q2_completed", False):
+            st.markdown("📈 **Factoring**: Mastered ✓") 
+        else:
+            st.markdown("📉 **Factoring**: Not yet mastered")
+            
+    with topic_cols[2]:
+        if st.session_state.get("q3_completed", False):
+            st.markdown("📈 **Trigonometry**: Mastered ✓")
+        else:
+            st.markdown("📉 **Trigonometry**: Not yet mastered")
+
+# Create tabs for additional information
+study_tips_tab, resources_tab, next_steps_tab = st.tabs(["Study Tips", "Resources", "Next Steps"])
+
+with study_tips_tab:
     st.markdown("""
     ### 📚 Study Tips for Grade 10 Math
     
@@ -599,7 +642,48 @@ with tips_tab:
     6. **Online Resources**: Use Khan Academy and other free resources
     7. **Ask for Help**: Don't hesitate to ask your teacher when you're stuck
     """)
+
+with resources_tab:
+    # Provide specific resources for review based on missed topics
+    st.markdown("### 📖 Resources for Your Math Journey")
     
+    if score < 3:
+        missed_topics = []
+        if not st.session_state.get("q1_completed", False):
+            missed_topics.append("Linear Equations")
+        if not st.session_state.get("q2_completed", False):
+            missed_topics.append("Factoring Quadratics")
+        if not st.session_state.get("q3_completed", False):
+            missed_topics.append("Trigonometry")
+            
+        for topic in missed_topics:
+            if topic == "Linear Equations":
+                st.markdown("""
+                #### Linear Equations Resources
+                - [Khan Academy: Solving Linear Equations](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities)
+                - Practice with isolating variables and solving step-by-step
+                """)
+            elif topic == "Factoring Quadratics":
+                st.markdown("""
+                #### Factoring Quadratics Resources
+                - [Khan Academy: Factoring Quadratics](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring)
+                - Try writing out all pairs of factors for the constant term
+                """)
+            elif topic == "Trigonometry":
+                st.markdown("""
+                #### Trigonometry Resources
+                - [Khan Academy: Basic Trigonometry](https://www.khanacademy.org/math/trigonometry/trigonometry-right-triangles)
+                - Practice using your calculator's inverse trigonometric functions
+                """)
+    else:
+        st.markdown("""
+        Congratulations on mastering all the topics! Here are some advanced resources to further your math skills:
+        
+        - [Khan Academy: Pre-calculus](https://www.khanacademy.org/math/precalculus)
+        - [Khan Academy: Calculus](https://www.khanacademy.org/math/calculus-1)
+        - [Desmos Graphing Calculator](https://www.desmos.com/calculator) for exploring functions
+        """)
+            
 with next_steps_tab:
     st.markdown("""
     ### 🚀 Next Steps
@@ -612,76 +696,11 @@ with next_steps_tab:
     4. **Take the assessment again** after reviewing to see your improvement
     """)
     
-    if st.button("📊 Get My Placement Recommendation", key="final_rec"):
-        score = st.session_state.current_score
-        st.subheader("📘 Your Placement Recommendation:")
-        if score == 3:
-            st.success("You're ready for Grade 11 math or higher! Great work.")
-            st.write("🎆") # Small firework celebration
-        elif score == 2:
-            # Track which question was incorrect
-            missed_topics = []
-            
-            # Check which questions were missed
-            if not st.session_state.get("q1_completed", False):
-                missed_topics.append("Linear Equations")
-            if not st.session_state.get("q2_completed", False):
-                missed_topics.append("Factoring Quadratics")
-            if not st.session_state.get("q3_completed", False):
-                missed_topics.append("Trigonometry")
-                
-            topic_to_review = ", ".join(missed_topics)
-            st.info(f"You can proceed to Grade 11 math, but should first review: {topic_to_review}. Your understanding of other topics is strong!")
-            
-            # Provide specific resources for review
-            with st.expander("Resources for Review"):
-                for topic in missed_topics:
-                    if topic == "Linear Equations":
-                        st.markdown("""
-                        ### Linear Equations Resources
-                        - [Khan Academy: Solving Linear Equations](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities)
-                        - Practice with isolating variables and solving step-by-step
-                        """)
-                    elif topic == "Factoring Quadratics":
-                        st.markdown("""
-                        ### Factoring Quadratics Resources
-                        - [Khan Academy: Factoring Quadratics](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring)
-                        - Try writing out all pairs of factors for the constant term
-                        """)
-                    elif topic == "Trigonometry":
-                        st.markdown("""
-                        ### Trigonometry Resources
-                        - [Khan Academy: Basic Trigonometry](https://www.khanacademy.org/math/trigonometry/trigonometry-right-triangles)
-                        - Practice using your calculator's inverse trigonometric functions
-                        """)
-        elif score == 1:
-            st.warning("Consider reviewing foundational Grade 10 topics before moving forward.")
-            
-            # Show which question was correct
-            correct_topic = None
-            if st.session_state.get("q1_completed", False):
-                correct_topic = "Linear Equations"
-            elif st.session_state.get("q2_completed", False):
-                correct_topic = "Factoring Quadratics"
-            elif st.session_state.get("q3_completed", False):
-                correct_topic = "Trigonometry"
-                
-            if correct_topic:
-                st.markdown(f"You demonstrated understanding of **{correct_topic}**. Focus on strengthening the other areas.")
-            
-            # Offer a chance to try new questions
-            if st.button("Try new questions for practice", key="try_new_all"):
-                st.session_state.regenerate_q1 = True
-                st.session_state.regenerate_q2 = True
-                st.session_state.regenerate_q3 = True
-                st.experimental_rerun()
-            
-        else:
-            st.error("We recommend placement in a fundamentals review course (Grade 7–9 topics).")
-            
-            # Offer comprehensive review option
-            if st.button("Review all topics with new questions", key="review_all"):
-                st.session_state.regenerate_q1 = True
-                st.session_state.regenerate_q2 = True
-                st.session_state.regenerate_q3 = True
-                st.experimental_rerun()
+    # Offer options based on score
+    if score < 3:
+        # Offer a chance to try new questions
+        if st.button("Try new questions for practice", key="try_new_all"):
+            st.session_state.regenerate_q1 = True
+            st.session_state.regenerate_q2 = True
+            st.session_state.regenerate_q3 = True
+            st.experimental_rerun()
