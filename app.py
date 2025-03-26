@@ -70,7 +70,6 @@ if st.sidebar.button("🔄 Reset Assessment"):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
     st.experimental_rerun()
-
 # -------------------
 # QUESTION 1: LINEAR EQUATION
 # -------------------
@@ -168,8 +167,6 @@ if st.button("✅ Submit Answer 1"):
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
-            # Small celebration without animation
-            st.write("🎆") 
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
             
@@ -191,17 +188,14 @@ if st.button("✅ Submit Answer 1"):
                 `{st.session_state.coeff * st.session_state.q1_solution + st.session_state.const} = {st.session_state.rhs}` ✓
                 """)
                 
-                # Add button for new question
-                if st.button("Try a new question", key="new_q1"):
-                    st.session_state.regenerate_q1 = True
-                    st.experimental_rerun()
-                else:
-                    st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
+                # Automatically generate a new question
+                st.session_state.regenerate_q1 = True
+                st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
+                st.experimental_rerun()
     except ValueError:
         st.error("Please enter a numeric value.")
 
 st.markdown("---")
-
 # -------------------
 # QUESTION 2: FACTORING
 # -------------------
@@ -322,8 +316,6 @@ if st.button("✅ Submit Answer 2"):
             if not st.session_state.get("q2_already_scored", False):
                 st.session_state.current_score += 1
                 st.session_state.q2_already_scored = True
-        # Removed balloons() call here
-        st.write("🎆") # Small firework celebration instead
     else:
         st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
         
@@ -351,15 +343,12 @@ if st.button("✅ Submit Answer 2"):
             So (x + {r1})(x + {r2}) = x² + {trinomial_b}x + {trinomial_c} ✓
             """)
             
-            # Add button for new question
-            if st.button("Try a new question", key="new_q2"):
-                st.session_state.regenerate_q2 = True
-                st.experimental_rerun()
-            else:
-                st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
+            # Automatically generate a new question
+            st.session_state.regenerate_q2 = True
+            st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
+            st.experimental_rerun()
 
 st.markdown("---")
-
 # -------------------
 # QUESTION 3: TRIGONOMETRY
 # -------------------
@@ -510,7 +499,6 @@ if st.button("✅ Submit Answer 3"):
                 if not st.session_state.get("q3_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q3_already_scored = True
-            st.write("🎆") # Small firework celebration
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.angle_deg}°.")
             
@@ -531,19 +519,17 @@ if st.button("✅ Submit Answer 3"):
                 - Result: A = {st.session_state.angle_deg}°
                 """)
                 
-                # Add button for new question
-                if st.button("Try a new question", key="new_q3"):
-                    st.session_state.regenerate_q3 = True
-                    st.experimental_rerun()
-                else:
-                    st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
+                # Automatically generate a new question
+                st.session_state.regenerate_q3 = True
+                st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
+                st.experimental_rerun()
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
 
+st.markdown("---")
 # -------------------
 # ASSESSMENT SUMMARY
 # -------------------
-st.markdown("---")
 st.header("Assessment Summary")
 
 # Calculate the final score and progress information
@@ -556,7 +542,6 @@ score = st.session_state.current_score
 st.subheader("📊 Your Placement Recommendation:")
 if score == 3:
     st.success("You're ready for Grade 11 math or higher! Great work.")
-    st.write("🎆") # Small firework celebration
 elif score == 2:
     # Track which question was incorrect
     missed_topics = []
@@ -626,7 +611,6 @@ else:
             st.markdown("📈 **Trigonometry**: Mastered ✓")
         else:
             st.markdown("📉 **Trigonometry**: Not yet mastered")
-
 # Create tabs for additional information
 study_tips_tab, resources_tab, next_steps_tab = st.tabs(["Study Tips", "Resources", "Next Steps"])
 
