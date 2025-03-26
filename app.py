@@ -384,46 +384,51 @@ if "trig_function" not in st.session_state or st.session_state.get("regenerate_q
 st.header("Question 3: Intro to Trigonometry")
 st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Find angle A in degrees.**")
 
-# Create a simplified Streamlit-based calculator
-st.markdown(f"### 🧮 Calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value})")
+# Very simple calculator to avoid any potential issues
+st.markdown("### Calculate the Angle")
+st.markdown(f"To find angle A, we need to calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value}).")
 
-calc_cols = st.columns([2, 1])
+# Show both ways to calculate it
+calc_cols = st.columns(2)
+
 with calc_cols[0]:
-    st.markdown("To find the angle A, we need to use the inverse trigonometric function:")
-
-    # Calculate the angle using Python directly and show the result
-    if st.session_state.trig_function == "sin":
-        example_result = round(math.degrees(math.asin(st.session_state.trig_value)), 2)
-        st.code(f"import math\nangle_in_degrees = math.degrees(math.asin({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
-    elif st.session_state.trig_function == "cos":
-        example_result = round(math.degrees(math.acos(st.session_state.trig_value)), 2)
-        st.code(f"import math\nangle_in_degrees = math.degrees(math.acos({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
-    else:  # tan
-        example_result = round(math.degrees(math.atan(st.session_state.trig_value)), 2)
-        st.code(f"import math\nangle_in_degrees = math.degrees(math.atan({st.session_state.trig_value}))\nprint(f\"Angle = {example_result}°\")")
+    st.markdown("#### Using Python's Math Library")
     
-    # Add a simple streamlit calculator
+    if st.session_state.trig_function == "sin":
+        result_code = f"math.degrees(math.asin({st.session_state.trig_value}))"
+    elif st.session_state.trig_function == "cos":
+        result_code = f"math.degrees(math.acos({st.session_state.trig_value}))"
+    else:  # tan
+        result_code = f"math.degrees(math.atan({st.session_state.trig_value}))"
+    
+    st.code(f"import math\nresult = {result_code}\nprint(f\"Angle = {round(eval(result_code), 2)}°\")")
+    
+with calc_cols[1]:
     st.markdown("#### Interactive Calculator")
     
-    if st.button(f"Calculate {st.session_state.trig_function}⁻¹({st.session_state.trig_value})"):
-        st.session_state.calculated_angle = st.session_state.angle_deg
-        st.success(f"Result: {st.session_state.angle_deg}°")
+    if st.button("Calculate Angle"):
+        if st.session_state.trig_function == "sin":
+            result = round(math.degrees(math.asin(st.session_state.trig_value)), 2)
+        elif st.session_state.trig_function == "cos":
+            result = round(math.degrees(math.acos(st.session_state.trig_value)), 2)
+        else:  # tan
+            result = round(math.degrees(math.atan(st.session_state.trig_value)), 2)
+        
+        st.session_state.calculated_angle = result
+        st.success(f"Result: {result}°")
     
     if "calculated_angle" in st.session_state:
         st.info(f"You can use this value as your answer: {st.session_state.calculated_angle}°")
 
-with calc_cols[1]:
-    st.markdown(f"""
-    #### Calculator Tips
-    
-    On a scientific calculator:
-    
-    1. Enter {st.session_state.trig_value}
-    2. Press the {st.session_state.trig_function}⁻¹ button
-    3. Read the angle in degrees
-    
-    **Note:** Make sure your calculator is in degree mode, not radian mode.
-    """)
+# Calculator tips
+st.markdown(f"""
+### Calculator Tips
+
+On a scientific calculator:
+1. Enter {st.session_state.trig_value}
+2. Press the {st.session_state.trig_function}⁻¹ button (or 2nd function + {st.session_state.trig_function})
+3. Read the angle in degrees (make sure calculator is in degree mode)
+""")
 
 refresher_col3, practice_col3 = st.columns([1, 1])
 with refresher_col3:
@@ -443,6 +448,7 @@ with refresher_col3:
         """)
         # Using a placeholder image instead of external URL for better compatibility with Streamlit
         st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
+
 with practice_col3:
     if st.button("🎮 Practice Similar Problem", key="practice_q3"):
         # Generate a practice trig problem
@@ -541,7 +547,7 @@ if st.button("✅ Submit Answer 3"):
                     st.info("Try again! You can edit your answer above and resubmit, or try a new question.")
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
-
+        
 # Add assessment summary below question 3
 # -------------------
 # ASSESSMENT SUMMARY
