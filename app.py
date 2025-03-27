@@ -157,7 +157,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q1_ai_response)
 
-# Submit button for Question 1 - with modified approach that avoids reruns for wrong answers
+# Modified Question 1 submit handler
 if st.button("✅ Submit Answer 1"):
     try:
         st.session_state.q1_attempts += 1
@@ -168,39 +168,45 @@ if st.button("✅ Submit Answer 1"):
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
-                    st.rerun()  # Only rerun for correct answers to update score
+                    st.rerun()  # Rerun for correct answers to update score
         else:
-            # Do NOT rerun for incorrect answers - show feedback directly
-            st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
+            # Store current solution to display in feedback
+            current_solution = st.session_state.q1_solution
+            current_coeff = st.session_state.coeff
+            current_const = st.session_state.const
+            current_rhs = st.session_state.rhs
             
-            # Provide detailed feedback for incorrect answers - expanded by default
+            # Generate a new problem for next attempt
+            old_solution = current_solution
+            while True:
+                st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
+                if st.session_state.q1_solution != old_solution:
+                    break
+            
+            # Show feedback for the incorrect answer
+            st.error(f"Oops! That's not quite right. The correct answer is {current_solution}.")
+            
+            # Provide detailed feedback for incorrect answers
             with st.expander("See Step-by-Step Solution", expanded=True):
                 st.markdown(f"""
                 ### Solution Walkthrough:
                 
-                **Step 1:** Subtract {st.session_state.const} from both sides  
-                `{st.session_state.coeff}x + {st.session_state.const} - {st.session_state.const} = {st.session_state.rhs} - {st.session_state.const}`  
-                `{st.session_state.coeff}x = {st.session_state.rhs - st.session_state.const}`
+                **Step 1:** Subtract {current_const} from both sides  
+                `{current_coeff}x + {current_const} - {current_const} = {current_rhs} - {current_const}`  
+                `{current_coeff}x = {current_rhs - current_const}`
                 
-                **Step 2:** Divide both sides by {st.session_state.coeff}  
-                `{st.session_state.coeff}x ÷ {st.session_state.coeff} = {st.session_state.rhs - st.session_state.const} ÷ {st.session_state.coeff}`  
-                `x = {st.session_state.q1_solution}`
+                **Step 2:** Divide both sides by {current_coeff}  
+                `{current_coeff}x ÷ {current_coeff} = {current_rhs - current_const} ÷ {current_coeff}`  
+                `x = {current_solution}`
                 
-                **Check:** Substitute x = {st.session_state.q1_solution} back into the original equation  
-                `{st.session_state.coeff} × {st.session_state.q1_solution} + {st.session_state.const} = {st.session_state.coeff * st.session_state.q1_solution + st.session_state.const}`  
-                `{st.session_state.coeff * st.session_state.q1_solution + st.session_state.const} = {st.session_state.rhs}` ✓
+                **Check:** Substitute x = {current_solution} back into the original equation  
+                `{current_coeff} × {current_solution} + {current_const} = {current_coeff * current_solution + current_const}`  
+                `{current_coeff * current_solution + current_const} = {current_rhs}` ✓
                 """)
             
-            # Add button to generate a new question
-            if st.button("Get a new question", key="new_q1"):
-                # Store the current solution before regenerating
-                old_solution = st.session_state.q1_solution
-                # Generate a new problem ensuring it has a different solution
-                while True:
-                    st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
-                    if st.session_state.q1_solution != old_solution:
-                        break
-                st.rerun()  # Only rerun after generating a new problem
+            # Show that a new question has been generated
+            st.info("A new question has been generated for you to try. Look at the equation above.")
+            
     except ValueError:
         st.error("Please enter a numeric value.")
 
@@ -315,6 +321,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             st.info(st.session_state.q2_ai_response)
 
 # Submit button for Question 2 - with modified approach that avoids reruns for wrong answers
+# Modified Question 2 submit handler
 if st.button("✅ Submit Answer 2"):
     st.session_state.q2_attempts += 1
     simplified = answer2.replace(" ", "")
@@ -325,47 +332,52 @@ if st.button("✅ Submit Answer 2"):
             if not st.session_state.get("q2_already_scored", False):
                 st.session_state.current_score += 1
                 st.session_state.q2_already_scored = True
-                st.rerun()  # Only rerun for correct answers
+                st.rerun()  # Rerun for correct answers
     else:
-        # Do NOT rerun for incorrect answers - show feedback directly
-        st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
+        # Store current values for feedback
+        current_r1 = st.session_state.r1
+        current_r2 = st.session_state.r2
+        current_b = st.session_state.trinomial_b
+        current_c = st.session_state.trinomial_c
+        
+        # Generate a new problem for next attempt
+        old_r1, old_r2 = current_r1, current_r2
+        while True:
+            st.session_state.r1, st.session_state.r2, trinomial_b, trinomial_c = generate_factoring_problem()
+            st.session_state.trinomial_b = trinomial_b
+            st.session_state.trinomial_c = trinomial_c
+            if (st.session_state.r1 != old_r1 or st.session_state.r2 != old_r2):
+                break
+        
+        # Show feedback for the incorrect answer
+        st.error(f"❌ Not quite. One correct answer is (x + {current_r1})(x + {current_r2}).")
         
         # Provide detailed feedback for incorrect answers
         with st.expander("See Step-by-Step Solution", expanded=True):
             st.markdown(f"""
             ### Solution Walkthrough:
             
-            **Step 1:** For the trinomial `x² + {trinomial_b}x + {trinomial_c}`, find two numbers that:
-            - Multiply to give {trinomial_c}
-            - Add to give {trinomial_b}
+            **Step 1:** For the trinomial `x² + {current_b}x + {current_c}`, find two numbers that:
+            - Multiply to give {current_c}
+            - Add to give {current_b}
             
-            **Step 2:** The numbers {r1} and {r2} work because:
-            - {r1} × {r2} = {r1 * r2}
-            - {r1} + {r2} = {r1 + r2}
+            **Step 2:** The numbers {current_r1} and {current_r2} work because:
+            - {current_r1} × {current_r2} = {current_r1 * current_r2}
+            - {current_r1} + {current_r2} = {current_r1 + current_r2}
             
             **Step 3:** Write the factored form:
-            - (x + {r1})(x + {r2})
+            - (x + {current_r1})(x + {current_r2})
             
             **Check:** Multiply it out to verify:
             - First term: x × x = x²
-            - Middle terms: x × {r2} + {r1} × x = {r2}x + {r1}x = {r1 + r2}x
-            - Last term: {r1} × {r2} = {r1 * r2}
+            - Middle terms: x × {current_r2} + {current_r1} × x = {current_r2}x + {current_r1}x = {current_r1 + current_r2}x
+            - Last term: {current_r1} × {current_r2} = {current_r1 * current_r2}
             
-            So (x + {r1})(x + {r2}) = x² + {trinomial_b}x + {trinomial_c} ✓
+            So (x + {current_r1})(x + {current_r2}) = x² + {current_b}x + {current_c} ✓
             """)
         
-        # Add button to generate a new question
-        if st.button("Get a new question", key="new_q2"):
-            # Store current values before regenerating
-            old_r1, old_r2 = st.session_state.r1, st.session_state.r2
-            # Generate a new problem ensuring it's different
-            while True:
-                st.session_state.r1, st.session_state.r2, trinomial_b, trinomial_c = generate_factoring_problem()
-                st.session_state.trinomial_b = trinomial_b
-                st.session_state.trinomial_c = trinomial_c
-                if (st.session_state.r1 != old_r1 or st.session_state.r2 != old_r2):
-                    break
-            st.rerun()  # Only rerun after generating a new problem
+        # Show that a new question has been generated
+        st.info("A new question has been generated for you to try. Look at the equation above.")
 
 st.markdown("---")
 
@@ -508,6 +520,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
             st.info(st.session_state.q3_ai_response)
 
 # Submit button for Question 3 - with modified approach that avoids reruns for wrong answers
+# Modified Question 3 submit handler
 if st.button("✅ Submit Answer 3"):
     try:
         st.session_state.q3_attempts += 1
@@ -519,40 +532,44 @@ if st.button("✅ Submit Answer 3"):
                 if not st.session_state.get("q3_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q3_already_scored = True
-                    st.rerun()  # Only rerun for correct answers
+                    st.rerun()  # Rerun for correct answers
         else:
-            # Do NOT rerun for incorrect answers - show feedback directly
-            st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.angle_deg}°.")
+            # Store current values for feedback
+            current_function = st.session_state.trig_function
+            current_value = st.session_state.trig_value
+            current_angle = st.session_state.angle_deg
+            
+            # Generate a new problem for next attempt
+            old_function = current_function
+            old_value = current_value
+            while True:
+                st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
+                if (st.session_state.trig_function != old_function or st.session_state.trig_value != old_value):
+                    break
+            
+            # Show feedback for the incorrect answer
+            st.error(f"Oops! That's not quite right. The correct answer is {current_angle}°.")
             
             # Provide detailed feedback for incorrect answers
             with st.expander("See Step-by-Step Solution", expanded=True):
                 st.markdown(f"""
                 ### Solution Walkthrough:
                 
-                **Step 1:** We know that {st.session_state.trig_function}(A) = {st.session_state.trig_value}
+                **Step 1:** We know that {current_function}(A) = {current_value}
                 
-                **Step 2:** To find angle A, we need to use the inverse function {st.session_state.trig_function}^(-1)
+                **Step 2:** To find angle A, we need to use the inverse function {current_function}^(-1)
                 
-                **Step 3:**
-  A = {st.session_state.trig_function}^(-1)({st.session_state.trig_value})
+                **Step 3:** A = {current_function}^(-1)({current_value})
                 
-                **Step 4:** Using a calculator with the {st.session_state.trig_function}^(-1) button:
-                - Enter {st.session_state.trig_value}
-                - Press {st.session_state.trig_function}^(-1)
-                - Result: A = {st.session_state.angle_deg}°
+                **Step 4:** Using a calculator with the {current_function}^(-1) button:
+                - Enter {current_value}
+                - Press {current_function}^(-1)
+                - Result: A = {current_angle}°
                 """)
             
-            # Add button to generate a new question
-            if st.button("Get a new question", key="new_q3"):
-                # Store current values before regenerating
-                old_function = st.session_state.trig_function
-                old_value = st.session_state.trig_value
-                # Generate a new problem ensuring it's different
-                while True:
-                    st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
-                    if (st.session_state.trig_function != old_function or st.session_state.trig_value != old_value):
-                        break
-                st.rerun()  # Only rerun after generating a new problem
+            # Show that a new question has been generated
+            st.info("A new question has been generated for you to try. Look at the problem above.")
+            
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
 
