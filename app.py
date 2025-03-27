@@ -167,10 +167,35 @@ if st.button("✅ Submit Answer 1"):
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
-                    # Force a rerun to update the sidebar immediately
                     st.rerun()
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
+            
+            # Show the solution expander
+            with st.expander("See Step-by-Step Solution"):
+                st.markdown(f"""
+                ### Solution Walkthrough:
+                
+                **Step 1:** Subtract {st.session_state.const} from both sides  
+                `{st.session_state.coeff}x + {st.session_state.const} - {st.session_state.const} = {st.session_state.rhs} - {st.session_state.const}`  
+                `{st.session_state.coeff}x = {st.session_state.rhs - st.session_state.const}`
+                
+                **Step 2:** Divide both sides by {st.session_state.coeff}  
+                `{st.session_state.coeff}x ÷ {st.session_state.coeff} = {st.session_state.rhs - st.session_state.const} ÷ {st.session_state.coeff}`  
+                `x = {st.session_state.q1_solution}`
+                
+                **Check:** Substitute x = {st.session_state.q1_solution} back into the original equation  
+                `{st.session_state.coeff} × {st.session_state.q1_solution} + {st.session_state.const} = {st.session_state.coeff * st.session_state.q1_solution + st.session_state.const}`  
+                `{st.session_state.coeff * st.session_state.q1_solution + st.session_state.const} = {st.session_state.rhs}` ✓
+                """)
+            
+            # Instead of immediate rerun, add a button for the user to get a new question
+            if st.button("Try a new question", key="new_q1"):
+                st.session_state.regenerate_q1 = True
+                st.rerun()
+                
+    except ValueError:
+        st.error("Please enter a numeric value.")
             
             # Provide detailed feedback for incorrect answers
             with st.expander("See Step-by-Step Solution"):
@@ -317,7 +342,6 @@ if st.button("✅ Submit Answer 2"):
             if not st.session_state.get("q2_already_scored", False):
                 st.session_state.current_score += 1
                 st.session_state.q2_already_scored = True
-                # Force a rerun to update the sidebar immediately
                 st.rerun()
     else:
         st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
@@ -346,9 +370,9 @@ if st.button("✅ Submit Answer 2"):
             So (x + {r1})(x + {r2}) = x² + {trinomial_b}x + {trinomial_c} ✓
             """)
             
-            # Set regenerate flag to true to get a new question
+        # Add button for new question
+        if st.button("Try a new question", key="new_q2"):
             st.session_state.regenerate_q2 = True
-            st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
             st.rerun()
 
 st.markdown("---")
@@ -493,6 +517,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
 if st.button("✅ Submit Answer 3"):
     try:
         st.session_state.q3_attempts += 1
+        # Convert answers to float and compare with a small tolerance for rounding errors
         if abs(float(answer3) - st.session_state.angle_deg) < 0.1:
             st.success(f"Correct! Great job finding the angle {st.session_state.angle_deg}°.")
             st.session_state.q3_completed = True
@@ -500,7 +525,6 @@ if st.button("✅ Submit Answer 3"):
                 if not st.session_state.get("q3_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q3_already_scored = True
-                    # Force a rerun to update the sidebar immediately
                     st.rerun()
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.angle_deg}°.")
@@ -522,10 +546,11 @@ if st.button("✅ Submit Answer 3"):
                 - Result: A = {st.session_state.angle_deg}°
                 """)
                 
-# Set regenerate flag to true to get a new question
+            # Add button for new question
+            if st.button("Try a new question", key="new_q3"):
                 st.session_state.regenerate_q3 = True
-                st.info("Let's try a new question! After reviewing the solution, continue with the new problem that has been generated for you.")
                 st.rerun()
+                
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
 st.markdown("---")
