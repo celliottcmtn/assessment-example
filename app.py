@@ -206,6 +206,7 @@ if st.button("✅ Submit Answer 1"):
             
             # Show that a new question has been generated
             st.info("A new question has been generated for you to try. Look at the equation above.")
+            st.rerun()
             
     except ValueError:
         st.error("Please enter a numeric value.")
@@ -378,6 +379,7 @@ if st.button("✅ Submit Answer 2"):
         
         # Show that a new question has been generated
         st.info("A new question has been generated for you to try. Look at the equation above.")
+        st.rerun()
 
 st.markdown("---")
 
@@ -569,6 +571,7 @@ if st.button("✅ Submit Answer 3"):
             
             # Show that a new question has been generated
             st.info("A new question has been generated for you to try. Look at the problem above.")
+            st.rerun()
             
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
