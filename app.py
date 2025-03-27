@@ -165,7 +165,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q1_ai_response)
 
-# Submit button for Question 1
+# Submit button for Question 1 - with modified approach that avoids reruns for wrong answers
 if st.button("✅ Submit Answer 1"):
     try:
         st.session_state.q1_attempts += 1
@@ -176,41 +176,41 @@ if st.button("✅ Submit Answer 1"):
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
-                    st.rerun()
+                    st.rerun()  # Only rerun for correct answers to update score
         else:
-            # Set flag to show solution instead of regenerating immediately
-            st.session_state.show_q1_solution = True
-            st.rerun()  # This rerun is just to refresh the page with the solution visible
+            # Do NOT rerun for incorrect answers - show feedback directly
+            st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
+            
+            # Provide detailed feedback for incorrect answers - expanded by default
+            with st.expander("See Step-by-Step Solution", expanded=True):
+                st.markdown(f"""
+                ### Solution Walkthrough:
+                
+                **Step 1:** Subtract {st.session_state.const} from both sides  
+                `{st.session_state.coeff}x + {st.session_state.const} - {st.session_state.const} = {st.session_state.rhs} - {st.session_state.const}`  
+                `{st.session_state.coeff}x = {st.session_state.rhs - st.session_state.const}`
+                
+                **Step 2:** Divide both sides by {st.session_state.coeff}  
+                `{st.session_state.coeff}x ÷ {st.session_state.coeff} = {st.session_state.rhs - st.session_state.const} ÷ {st.session_state.coeff}`  
+                `x = {st.session_state.q1_solution}`
+                
+                **Check:** Substitute x = {st.session_state.q1_solution} back into the original equation  
+                `{st.session_state.coeff} × {st.session_state.q1_solution} + {st.session_state.const} = {st.session_state.coeff * st.session_state.q1_solution + st.session_state.const}`  
+                `{st.session_state.coeff * st.session_state.q1_solution + st.session_state.const} = {st.session_state.rhs}` ✓
+                """)
+            
+            # Add button to generate a new question
+            if st.button("Get a new question", key="new_q1"):
+                # Store the current solution before regenerating
+                old_solution = st.session_state.q1_solution
+                # Generate a new problem ensuring it has a different solution
+                while True:
+                    st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
+                    if st.session_state.q1_solution != old_solution:
+                        break
+                st.rerun()  # Only rerun after generating a new problem
     except ValueError:
         st.error("Please enter a numeric value.")
-
-# After the submit button, check if we need to show a solution
-if st.session_state.show_q1_solution:
-    st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
-    
-    # Provide detailed feedback for incorrect answers
-    with st.expander("See Step-by-Step Solution", expanded=True):
-        st.markdown(f"""
-        ### Solution Walkthrough:
-        
-        **Step 1:** Subtract {st.session_state.const} from both sides  
-        `{st.session_state.coeff}x + {st.session_state.const} - {st.session_state.const} = {st.session_state.rhs} - {st.session_state.const}`  
-        `{st.session_state.coeff}x = {st.session_state.rhs - st.session_state.const}`
-        
-        **Step 2:** Divide both sides by {st.session_state.coeff}  
-        `{st.session_state.coeff}x ÷ {st.session_state.coeff} = {st.session_state.rhs - st.session_state.const} ÷ {st.session_state.coeff}`  
-        `x = {st.session_state.q1_solution}`
-        
-        **Check:** Substitute x = {st.session_state.q1_solution} back into the original equation  
-        `{st.session_state.coeff} × {st.session_state.q1_solution} + {st.session_state.const} = {st.session_state.coeff * st.session_state.q1_solution + st.session_state.const}`  
-        `{st.session_state.coeff * st.session_state.q1_solution + st.session_state.const} = {st.session_state.rhs}` ✓
-        """)
-    
-    # Add button for new question
-    if st.button("Try a new question", key="new_q1"):
-        st.session_state.regenerate_q1 = True
-        st.session_state.show_q1_solution = False  # Reset the solution flag
-        st.rerun()
 
 st.markdown("---")
 # PART 3: QUESTION 2 - FACTORING
