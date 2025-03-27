@@ -167,6 +167,8 @@ if st.button("✅ Submit Answer 1"):
                 if not st.session_state.get("q1_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q1_already_scored = True
+                    # Force a rerun to update the sidebar immediately
+                    st.rerun()
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_solution}.")
             
@@ -315,6 +317,8 @@ if st.button("✅ Submit Answer 2"):
             if not st.session_state.get("q2_already_scored", False):
                 st.session_state.current_score += 1
                 st.session_state.q2_already_scored = True
+                # Force a rerun to update the sidebar immediately
+                st.rerun()
     else:
         st.error(f"❌ Not quite. One correct answer is (x + {r1})(x + {r2}).")
         
@@ -489,7 +493,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
 if st.button("✅ Submit Answer 3"):
     try:
         st.session_state.q3_attempts += 1
-        # Convert answers to float and compare with a small tolerance for rounding errors
         if abs(float(answer3) - st.session_state.angle_deg) < 0.1:
             st.success(f"Correct! Great job finding the angle {st.session_state.angle_deg}°.")
             st.session_state.q3_completed = True
@@ -497,6 +500,8 @@ if st.button("✅ Submit Answer 3"):
                 if not st.session_state.get("q3_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q3_already_scored = True
+                    # Force a rerun to update the sidebar immediately
+                    st.rerun()
         else:
             st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.angle_deg}°.")
             
@@ -523,7 +528,6 @@ if st.button("✅ Submit Answer 3"):
                 st.rerun()
     except ValueError:
         st.error("Please enter a numeric value for the angle.")
-
 st.markdown("---")
 
 # PART 5: ASSESSMENT SUMMARY - ONLY SHOW WHEN QUESTION 3 IS COMPLETED
