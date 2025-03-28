@@ -6,6 +6,82 @@ import streamlit as st
 # Load the OpenAI API key from Streamlit secrets
 client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
+# ----- DEFINE ALL FUNCTIONS FIRST -----
+
+# QUESTION 1: LINEAR EQUATION
+# Function to generate a new linear equation
+def generate_linear_equation():
+    coeff = random.randint(2, 8)
+    solution = random.randint(-5, 10)  # Random solution value
+    const = random.randint(-10, 15)
+    rhs = coeff * solution + const
+    return coeff, const, rhs, solution
+
+# Function to generate new question for Q1 and store it
+def generate_new_q1():
+    old_solution = st.session_state.q1_solution
+    while True:
+        new_coeff, new_const, new_rhs, new_solution = generate_linear_equation()
+        if new_solution != old_solution:
+            break
+    return new_coeff, new_const, new_rhs, new_solution
+
+# QUESTION 2: FACTORING
+# Function to generate a new factoring problem
+def generate_factoring_problem():
+    # Generate factors with more variety
+    factor_options = [
+        (1, 2), (1, 3), (1, 4), (1, 5), (1, 6),
+        (2, 3), (2, 5), (2, 7),
+        (3, 4), (3, 5),
+        (-1, 2), (-1, 3), (-1, 4), (-1, 5),
+        (-2, 3), (-2, 5), (-3, 2), (-3, 4)
+    ]
+    r1, r2 = random.choice(factor_options)
+    trinomial_b = r1 + r2
+    trinomial_c = r1 * r2
+    return r1, r2, trinomial_b, trinomial_c
+
+# Function to generate new question for Q2 and store it
+def generate_new_q2():
+    old_r1, old_r2 = st.session_state.r1, st.session_state.r2
+    while True:
+        new_r1, new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
+        if (new_r1 != old_r1 or new_r2 != old_r2):
+            break
+    return new_r1, new_r2, new_trinomial_b, new_trinomial_c
+
+# QUESTION 3: TRIGONOMETRY
+# Function to generate a new trigonometry problem
+def generate_trig_problem():
+    # Random trig function (sin, cos, or tan)
+    trig_function = random.choice(["sin", "cos", "tan"])
+    
+    # Generate appropriate values based on the function
+    if trig_function == "sin":
+        trig_value = round(random.uniform(0.1, 0.95), 2)
+        angle_deg = round(math.degrees(math.asin(trig_value)), 2)
+    elif trig_function == "cos":
+        trig_value = round(random.uniform(0.1, 0.95), 2)
+        angle_deg = round(math.degrees(math.acos(trig_value)), 2)
+    else:  # tan
+        trig_value = round(random.uniform(0.1, 2.0), 2)
+        angle_deg = round(math.degrees(math.atan(trig_value)), 2)
+    
+    return trig_function, trig_value, angle_deg
+
+# Function to generate new question for Q3 and store it
+def generate_new_q3():
+    old_function = st.session_state.trig_function
+    old_value = st.session_state.trig_value
+    while True:
+        new_trig_function, new_trig_value, new_angle_deg = generate_trig_problem()
+        if (new_trig_function != old_function or new_trig_value != old_value):
+            break
+    return new_trig_function, new_trig_value, new_angle_deg
+
+# ----- APP BEGINS HERE -----
+
 st.title("📘 Grade 10 Math Placement Assessment")
 st.markdown("Select the best answer or enter your solution. Click 'Need a refresher?' for help before answering.")
 
@@ -79,27 +155,19 @@ if st.sidebar.button("🔄 Reset Assessment"):
         del st.session_state[key]
     st.rerun()
 
-# QUESTION 1: LINEAR EQUATION
-# Function to generate a new linear equation
-def generate_linear_equation():
-    coeff = random.randint(2, 8)
-    solution = random.randint(-5, 10)  # Random solution value
-    const = random.randint(-10, 15)
-    rhs = coeff * solution + const
-    return coeff, const, rhs, solution
-
-# Function to generate new question for Q1 and store it
-def generate_new_q1():
-    old_solution = st.session_state.q1_solution
-    while True:
-        new_coeff, new_const, new_rhs, new_solution = generate_linear_equation()
-        if new_solution != old_solution:
-            break
-    return new_coeff, new_const, new_rhs, new_solution
-
 # Initialize random values in session state
 if "coeff" not in st.session_state:
     st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
+
+# Initialize factoring problem
+if "r1" not in st.session_state:
+    st.session_state.r1, st.session_state.r2, st.session_state.trinomial_b, st.session_state.trinomial_c = generate_factoring_problem()
+
+# Initialize trigonometry problem
+if "trig_function" not in st.session_state:
+    st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
+
+# ----- QUESTION 1 IMPLEMENTATION -----
 
 st.header("Question 1: Solving Linear Equations")
 st.markdown(f"**Solve for x in the equation below:**")
@@ -233,7 +301,7 @@ if st.session_state.showing_q3_feedback:
 
 st.markdown("---")
 
-# ASSESSMENT SUMMARY - SHOW WHEN AT LEAST ONE QUESTION IS COMPLETED
+# ----- ASSESSMENT SUMMARY -----
 # Show assessment summary based on completed questions
 if st.session_state.q1_completed or st.session_state.q2_completed or st.session_state.q3_completed:
     st.header("Assessment Summary")
@@ -393,15 +461,12 @@ if st.session_state.q1_completed or st.session_state.q2_completed or st.session_
             # Offer a chance to try new questions
             if st.button("Try new questions for practice", key="try_new_all"):
                 # Reset appropriate session state values for regeneration
-                st.session_state.q1_completed = False if not st.session_state.q1_completed else True
-                st.session_state.q2_completed = False if not st.session_state.q2_completed else True
-                st.session_state.q3_completed = False if not st.session_state.q3_completed else True
-                
-                # Only regenerate questions for topics that haven't been mastered
                 if not st.session_state.q1_completed:
                     st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
+                
                 if not st.session_state.q2_completed:
                     st.session_state.r1, st.session_state.r2, st.session_state.trinomial_b, st.session_state.trinomial_c = generate_factoring_problem()
+                
                 if not st.session_state.q3_completed:
                     st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
                 
@@ -499,34 +564,7 @@ if st.session_state.showing_q1_feedback:
 
 st.markdown("---")
 
-# QUESTION 2: FACTORING
-# Function to generate a new factoring problem
-def generate_factoring_problem():
-    # Generate factors with more variety
-    factor_options = [
-        (1, 2), (1, 3), (1, 4), (1, 5), (1, 6),
-        (2, 3), (2, 5), (2, 7),
-        (3, 4), (3, 5),
-        (-1, 2), (-1, 3), (-1, 4), (-1, 5),
-        (-2, 3), (-2, 5), (-3, 2), (-3, 4)
-    ]
-    r1, r2 = random.choice(factor_options)
-    trinomial_b = r1 + r2
-    trinomial_c = r1 * r2
-    return r1, r2, trinomial_b, trinomial_c
-
-# Function to generate new question for Q2 and store it
-def generate_new_q2():
-    old_r1, old_r2 = st.session_state.r1, st.session_state.r2
-    while True:
-        new_r1, new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
-        if (new_r1 != old_r1 or new_r2 != old_r2):
-            break
-    return new_r1, new_r2, new_trinomial_b, new_trinomial_c
-
-# Initialize factoring problem
-if "r1" not in st.session_state:
-    st.session_state.r1, st.session_state.r2, st.session_state.trinomial_b, st.session_state.trinomial_c = generate_factoring_problem()
+# ----- QUESTION 2 IMPLEMENTATION -----
 
 st.header("Question 2: Factoring Quadratic Equations")
 st.markdown(f"**Factor the quadratic expression below:**")
@@ -680,38 +718,7 @@ if st.session_state.showing_q2_feedback:
 
 st.markdown("---")
 
-# QUESTION 3: TRIGONOMETRY
-# Function to generate a new trigonometry problem
-def generate_trig_problem():
-    # Random trig function (sin, cos, or tan)
-    trig_function = random.choice(["sin", "cos", "tan"])
-    
-    # Generate appropriate values based on the function
-    if trig_function == "sin":
-        trig_value = round(random.uniform(0.1, 0.95), 2)
-        angle_deg = round(math.degrees(math.asin(trig_value)), 2)
-    elif trig_function == "cos":
-        trig_value = round(random.uniform(0.1, 0.95), 2)
-        angle_deg = round(math.degrees(math.acos(trig_value)), 2)
-    else:  # tan
-        trig_value = round(random.uniform(0.1, 2.0), 2)
-        angle_deg = round(math.degrees(math.atan(trig_value)), 2)
-    
-    return trig_function, trig_value, angle_deg
-
-# Function to generate new question for Q3 and store it
-def generate_new_q3():
-    old_function = st.session_state.trig_function
-    old_value = st.session_state.trig_value
-    while True:
-        new_trig_function, new_trig_value, new_angle_deg = generate_trig_problem()
-        if (new_trig_function != old_function or new_trig_value != old_value):
-            break
-    return new_trig_function, new_trig_value, new_angle_deg
-
-# Initialize trigonometry problem
-if "trig_function" not in st.session_state:
-    st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
+# ----- QUESTION 3 IMPLEMENTATION -----
 
 st.header("Question 3: Intro to Trigonometry")
 st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Find angle A in degrees.**")
