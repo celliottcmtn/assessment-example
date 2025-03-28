@@ -30,13 +30,13 @@ if "q2_attempts" not in st.session_state:
 if "q3_attempts" not in st.session_state:
     st.session_state.q3_attempts = 0
 
-# Initialize new question ready flags
-if "new_q1_ready" not in st.session_state:
-    st.session_state.new_q1_ready = False
-if "new_q2_ready" not in st.session_state:
-    st.session_state.new_q2_ready = False
-if "new_q3_ready" not in st.session_state:
-    st.session_state.new_q3_ready = False
+# Initialize feedback flags
+if "showing_q1_feedback" not in st.session_state:
+    st.session_state.showing_q1_feedback = False
+if "showing_q2_feedback" not in st.session_state:
+    st.session_state.showing_q2_feedback = False
+if "showing_q3_feedback" not in st.session_state:
+    st.session_state.showing_q3_feedback = False
 
 # Display progress indicators
 with col1:
@@ -88,10 +88,10 @@ def generate_linear_equation():
     rhs = coeff * solution + const
     return coeff, const, rhs, solution
 
-# Initialize random values in session state or regenerate when needed
-if "coeff" not in st.session_state or st.session_state.get("regenerate_q1", False):
+# Initialize random values in session state
+if "coeff" not in st.session_state:
     st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
-    st.session_state.regenerate_q1 = False
+
 st.header("Question 1: Solving Linear Equations")
 st.markdown(f"**Solve for x in the equation below:**")
 st.latex(f"{st.session_state.coeff}x + {st.session_state.const} = {st.session_state.rhs}")
@@ -165,6 +165,15 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q1_ai_response)
 
+# Function to generate new question for Q1 and store it
+def generate_new_q1():
+    old_solution = st.session_state.q1_solution
+    while True:
+        new_coeff, new_const, new_rhs, new_solution = generate_linear_equation()
+        if new_solution != old_solution:
+            break
+    return new_coeff, new_const, new_rhs, new_solution
+
 # Modified Question 1 submit handler
 if st.button("✅ Submit Answer 1"):
     try:
@@ -172,59 +181,56 @@ if st.button("✅ Submit Answer 1"):
         if abs(float(answer1) - st.session_state.q1_solution) < 0.01:
             st.success(f"Correct! Great job solving for x = {st.session_state.q1_solution}.")
             st.session_state.q1_completed = True
-            if "current_score" in st.session_state:
-                if not st.session_state.get("q1_already_scored", False):
-                    st.session_state.current_score += 1
-                    st.session_state.q1_already_scored = True
-                    st.rerun()  # Rerun for correct answers to update score
+            if not st.session_state.get("q1_already_scored", False):
+                st.session_state.current_score += 1
+                st.session_state.q1_already_scored = True
+                st.rerun()  # Only rerun on correct answer to update score
         else:
-            # Store current solution to display in feedback
-            current_solution = st.session_state.q1_solution
-            current_coeff = st.session_state.coeff
-            current_const = st.session_state.const
-            current_rhs = st.session_state.rhs
+            # Store current problem details for feedback
+            st.session_state.q1_last_coeff = st.session_state.coeff
+            st.session_state.q1_last_const = st.session_state.const
+            st.session_state.q1_last_rhs = st.session_state.rhs
+            st.session_state.q1_last_solution = st.session_state.q1_solution
             
-            # Generate a new problem for next attempt (but don't rerun)
-            st.session_state.new_q1_ready = True
-            old_solution = current_solution
-            while True:
-                st.session_state.new_coeff, st.session_state.new_const, st.session_state.new_rhs, st.session_state.new_q1_solution = generate_linear_equation()
-                if st.session_state.new_q1_solution != old_solution:
-                    break
+            # Generate and store new problem for next attempt
+            new_coeff, new_const, new_rhs, new_solution = generate_new_q1()
+            st.session_state.q1_next_coeff = new_coeff
+            st.session_state.q1_next_const = new_const
+            st.session_state.q1_next_rhs = new_rhs
+            st.session_state.q1_next_solution = new_solution
             
-            # Show feedback for the incorrect answer
-            st.error(f"Oops! That's not quite right. The correct answer is {current_solution}.")
+            # Show feedback without rerunning
+            st.session_state.showing_q1_feedback = True
+            st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_last_solution}.")
             
-            # Provide detailed feedback for incorrect answers
+            # Provide detailed feedback
             with st.expander("See Step-by-Step Solution", expanded=True):
                 st.markdown(f"""
                 ### Solution Walkthrough:
                 
-                **Step 1:** Subtract {current_const} from both sides  
-                `{current_coeff}x + {current_const} - {current_const} = {current_rhs} - {current_const}`  
-                `{current_coeff}x = {current_rhs - current_const}`
+                **Step 1:** Subtract {st.session_state.q1_last_const} from both sides  
+                `{st.session_state.q1_last_coeff}x + {st.session_state.q1_last_const} - {st.session_state.q1_last_const} = {st.session_state.q1_last_rhs} - {st.session_state.q1_last_const}`  
+                `{st.session_state.q1_last_coeff}x = {st.session_state.q1_last_rhs - st.session_state.q1_last_const}`
                 
-                **Step 2:** Divide both sides by {current_coeff}  
-                `{current_coeff}x ÷ {current_coeff} = {current_rhs - current_const} ÷ {current_coeff}`  
-                `x = {current_solution}`
+                **Step 2:** Divide both sides by {st.session_state.q1_last_coeff}  
+                `{st.session_state.q1_last_coeff}x ÷ {st.session_state.q1_last_coeff} = {st.session_state.q1_last_rhs - st.session_state.q1_last_const} ÷ {st.session_state.q1_last_coeff}`  
+                `x = {st.session_state.q1_last_solution}`
                 
-                **Check:** Substitute x = {current_solution} back into the original equation  
-                `{current_coeff} × {current_solution} + {current_const} = {current_coeff * current_solution + current_const}`  
-                `{current_coeff * current_solution + current_const} = {current_rhs}` ✓
+                **Check:** Substitute x = {st.session_state.q1_last_solution} back into the original equation  
+                `{st.session_state.q1_last_coeff} × {st.session_state.q1_last_solution} + {st.session_state.q1_last_const} = {st.session_state.q1_last_coeff * st.session_state.q1_last_solution + st.session_state.q1_last_const}`  
+                `{st.session_state.q1_last_coeff * st.session_state.q1_last_solution + st.session_state.q1_last_const} = {st.session_state.q1_last_rhs}` ✓
                 """)
-                
-            # Add a next question button
-            if st.button("➡️ Next Question", key="next_q1"):
-                # Apply the new question values
-                st.session_state.coeff = st.session_state.new_coeff
-                st.session_state.const = st.session_state.new_const
-                st.session_state.rhs = st.session_state.new_rhs
-                st.session_state.q1_solution = st.session_state.new_q1_solution
-                st.session_state.new_q1_ready = False
-                st.rerun()  # Now we can rerun with the new question
-            
-    except ValueError:
-        st.error("Please enter a numeric value.")
+
+# Display the Next Question button for Q1 when showing feedback
+if st.session_state.showing_q1_feedback:
+    if st.button("➡️ Next Question", key="next_q1"):
+        # Apply stored next question values
+        st.session_state.coeff = st.session_state.q1_next_coeff
+        st.session_state.const = st.session_state.q1_next_const
+        st.session_state.rhs = st.session_state.q1_next_rhs
+        st.session_state.q1_solution = st.session_state.q1_next_solution
+        st.session_state.showing_q1_feedback = False
+        st.rerun()
 
 st.markdown("---")
 
@@ -244,19 +250,14 @@ def generate_factoring_problem():
     trinomial_c = r1 * r2
     return r1, r2, trinomial_b, trinomial_c
 
-# Initialize or regenerate factoring problem
-if "r1" not in st.session_state or st.session_state.get("regenerate_q2", False):
-    st.session_state.r1, st.session_state.r2, trinomial_b, trinomial_c = generate_factoring_problem()
-    st.session_state.trinomial_b = trinomial_b
-    st.session_state.trinomial_c = trinomial_c
-    st.session_state.regenerate_q2 = False
-else:
-    trinomial_b = st.session_state.trinomial_b
-    trinomial_c = st.session_state.trinomial_c
+# Initialize factoring problem
+if "r1" not in st.session_state:
+    st.session_state.r1, st.session_state.r2, st.session_state.trinomial_b, st.session_state.trinomial_c = generate_factoring_problem()
 
 st.header("Question 2: Factoring Quadratic Equations")
 st.markdown(f"**Factor the quadratic expression below:**")
-st.latex(f"x^2 + {trinomial_b}x + {trinomial_c}")
+st.latex(f"x^2 + {st.session_state.trinomial_b}x + {st.session_state.trinomial_c}")
+
 refresher_col2, practice_col2 = st.columns([1, 1])
 with refresher_col2:
     if st.button("🔄 Need a refresher for Question 2", key="refresh_q2"):
@@ -325,7 +326,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
                         },
                         {
                             "role": "user",
-                            "content": f"I'm factoring this quadratic expression: x^2 + {trinomial_b}x + {trinomial_c}. {q2_ai_input}"
+                            "content": f"I'm factoring this quadratic expression: x^2 + {st.session_state.trinomial_b}x + {st.session_state.trinomial_c}. {q2_ai_input}"
                         }
                     ]
                 )
@@ -336,6 +337,15 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q2_ai_response)
 
+# Function to generate new question for Q2 and store it
+def generate_new_q2():
+    old_r1, old_r2 = st.session_state.r1, st.session_state.r2
+    while True:
+        new_r1, new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
+        if (new_r1 != old_r1 or new_r2 != old_r2):
+            break
+    return new_r1, new_r2, new_trinomial_b, new_trinomial_c
+
 # Modified Question 2 submit handler
 if st.button("✅ Submit Answer 2"):
     st.session_state.q2_attempts += 1
@@ -343,64 +353,62 @@ if st.button("✅ Submit Answer 2"):
     if any(simplified == ans.replace(" ", "") for ans in correct_factored):
         st.success("✅ Correct! Well done.")
         st.session_state.q2_completed = True
-        if "current_score" in st.session_state:
-            if not st.session_state.get("q2_already_scored", False):
-                st.session_state.current_score += 1
-                st.session_state.q2_already_scored = True
-                st.rerun()  # Rerun for correct answers
+        if not st.session_state.get("q2_already_scored", False):
+            st.session_state.current_score += 1
+            st.session_state.q2_already_scored = True
+            st.rerun()  # Only rerun on correct answer
     else:
-        # Store current values for feedback
-        current_r1 = st.session_state.r1
-        current_r2 = st.session_state.r2
-        current_b = st.session_state.trinomial_b
-        current_c = st.session_state.trinomial_c
+        # Store current problem details for feedback
+        st.session_state.q2_last_r1 = st.session_state.r1
+        st.session_state.q2_last_r2 = st.session_state.r2
+        st.session_state.q2_last_b = st.session_state.trinomial_b
+        st.session_state.q2_last_c = st.session_state.trinomial_c
         
-        # Generate a new problem for next attempt (but don't rerun)
-        st.session_state.new_q2_ready = True
-        old_r1, old_r2 = current_r1, current_r2
-        while True:
-            st.session_state.new_r1, st.session_state.new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
-            st.session_state.new_trinomial_b = new_trinomial_b
-            st.session_state.new_trinomial_c = new_trinomial_c
-            if (st.session_state.new_r1 != old_r1 or st.session_state.new_r2 != old_r2):
-                break
+        # Generate and store new problem for next attempt
+        new_r1, new_r2, new_trinomial_b, new_trinomial_c = generate_new_q2()
+        st.session_state.q2_next_r1 = new_r1
+        st.session_state.q2_next_r2 = new_r2
+        st.session_state.q2_next_b = new_trinomial_b
+        st.session_state.q2_next_c = new_trinomial_c
         
-        # Show feedback for the incorrect answer
-        st.error(f"❌ Not quite. One correct answer is (x + {current_r1})(x + {current_r2}).")
+        # Show feedback without rerunning
+        st.session_state.showing_q2_feedback = True
+        st.error(f"❌ Not quite. One correct answer is (x + {st.session_state.q2_last_r1})(x + {st.session_state.q2_last_r2}).")
         
-        # Provide detailed feedback for incorrect answers
+        # Provide detailed feedback
         with st.expander("See Step-by-Step Solution", expanded=True):
             st.markdown(f"""
             ### Solution Walkthrough:
             
-            **Step 1:** For the trinomial `x² + {current_b}x + {current_c}`, find two numbers that:
-            - Multiply to give {current_c}
-            - Add to give {current_b}
+            **Step 1:** For the trinomial `x² + {st.session_state.q2_last_b}x + {st.session_state.q2_last_c}`, find two numbers that:
+            - Multiply to give {st.session_state.q2_last_c}
+            - Add to give {st.session_state.q2_last_b}
             
-            **Step 2:** The numbers {current_r1} and {current_r2} work because:
-            - {current_r1} × {current_r2} = {current_r1 * current_r2}
-            - {current_r1} + {current_r2} = {current_r1 + current_r2}
+            **Step 2:** The numbers {st.session_state.q2_last_r1} and {st.session_state.q2_last_r2} work because:
+            - {st.session_state.q2_last_r1} × {st.session_state.q2_last_r2} = {st.session_state.q2_last_r1 * st.session_state.q2_last_r2}
+            - {st.session_state.q2_last_r1} + {st.session_state.q2_last_r2} = {st.session_state.q2_last_r1 + st.session_state.q2_last_r2}
             
             **Step 3:** Write the factored form:
-            - (x + {current_r1})(x + {current_r2})
+            - (x + {st.session_state.q2_last_r1})(x + {st.session_state.q2_last_r2})
             
             **Check:** Multiply it out to verify:
             - First term: x × x = x²
-            - Middle terms: x × {current_r2} + {current_r1} × x = {current_r2}x + {current_r1}x = {current_r1 + current_r2}x
-            - Last term: {current_r1} × {current_r2} = {current_r1 * current_r2}
+            - Middle terms: x × {st.session_state.q2_last_r2} + {st.session_state.q2_last_r1} × x = {st.session_state.q2_last_r2}x + {st.session_state.q2_last_r1}x = {st.session_state.q2_last_r1 + st.session_state.q2_last_r2}x
+            - Last term: {st.session_state.q2_last_r1} × {st.session_state.q2_last_r2} = {st.session_state.q2_last_r1 * st.session_state.q2_last_r2}
             
-            So (x + {current_r1})(x + {current_r2}) = x² + {current_b}x + {current_c} ✓
+            So (x + {st.session_state.q2_last_r1})(x + {st.session_state.q2_last_r2}) = x² + {st.session_state.q2_last_b}x + {st.session_state.q2_last_c} ✓
             """)
-        
-        # Add a next question button
-        if st.button("➡️ Next Question", key="next_q2"):
-            # Apply the new question values
-            st.session_state.r1 = st.session_state.new_r1
-            st.session_state.r2 = st.session_state.new_r2 
-            st.session_state.trinomial_b = st.session_state.new_trinomial_b
-            st.session_state.trinomial_c = st.session_state.new_trinomial_c
-            st.session_state.new_q2_ready = False
-            st.rerun()  # Now we can rerun with the new question
+
+# Display the Next Question button for Q2 when showing feedback
+if st.session_state.showing_q2_feedback:
+    if st.button("➡️ Next Question", key="next_q2"):
+        # Apply stored next question values
+        st.session_state.r1 = st.session_state.q2_next_r1
+        st.session_state.r2 = st.session_state.q2_next_r2
+        st.session_state.trinomial_b = st.session_state.q2_next_b
+        st.session_state.trinomial_c = st.session_state.q2_next_c
+        st.session_state.showing_q2_feedback = False
+        st.rerun()
 
 st.markdown("---")
 
@@ -423,10 +431,10 @@ def generate_trig_problem():
     
     return trig_function, trig_value, angle_deg
 
-# Initialize or regenerate trigonometry problem
-if "trig_function" not in st.session_state or st.session_state.get("regenerate_q3", False):
+# Initialize trigonometry problem
+if "trig_function" not in st.session_state:
     st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
-    st.session_state.regenerate_q3 = False
+
 st.header("Question 3: Intro to Trigonometry")
 st.markdown(f"**A right triangle has an angle A such that {st.session_state.trig_function}(A) = {st.session_state.trig_value}. Find angle A in degrees.**")
 
@@ -511,258 +519,3 @@ with practice_col3:
             
             On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
             """)
-
-answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
-
-# Improved AI tutor section for Question 3
-if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_toggle"):
-    st.info(f"You can ask questions like 'How do I find an angle from its {st.session_state.trig_function}?' or 'What buttons do I press on my calculator?'")
-    q3_ai_input = st.text_area("What would you like to ask about Question 3?", key="q3_ai_text")
-    
-    if st.button("Ask AI about Question 3"):
-        if q3_ai_input.strip():
-            with st.spinner("Asking AI tutor for help..."):
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are a helpful math tutor for a Grade 10 student. Provide clear, step-by-step guidance without giving away the complete answer. Use encouraging language and scaffold your explanation so the student understands the process. Keep explanations under 150 words, use simple language, and focus on building understanding rather than just the solution."
-                        },
-                        {
-                            "role": "user",
-                            "content": f"I'm trying to find the angle A in degrees when {st.session_state.trig_function}(A) = {st.session_state.trig_value}. {q3_ai_input}"
-                        }
-                    ]
-                )
-                # Store AI response in session state
-                st.session_state.q3_ai_response = response.choices[0].message.content
-            
-            # Display the response from session state in a nicer format
-            st.markdown("### 👨‍🏫 AI Tutor Help")
-            st.info(st.session_state.q3_ai_response)
-
-# Modified Question 3 submit handler
-if st.button("✅ Submit Answer 3"):
-    try:
-        st.session_state.q3_attempts += 1
-        # Convert answers to float and compare with a small tolerance for rounding errors
-        if abs(float(answer3) - st.session_state.angle_deg) < 0.1:
-            st.success(f"Correct! Great job finding the angle {st.session_state.angle_deg}°.")
-            st.session_state.q3_completed = True
-            if "current_score" in st.session_state:
-                if not st.session_state.get("q3_already_scored", False):
-                    st.session_state.current_score += 1
-                    st.session_state.q3_already_scored = True
-                    st.rerun()  # Rerun for correct answers
-        else:
-            # Store current values for feedback
-            current_function = st.session_state.trig_function
-            current_value = st.session_state.trig_value
-            current_angle = st.session_state.angle_deg
-            
-            # Generate a new problem for next attempt (but don't rerun)
-            st.session_state.new_q3_ready = True
-            old_function = current_function
-            old_value = current_value
-            while True:
-                st.session_state.new_trig_function, st.session_state.new_trig_value, st.session_state.new_angle_deg = generate_trig_problem()
-                if (st.session_state.new_trig_function != old_function or st.session_state.new_trig_value != old_value):
-                    break
-            
-            # Show feedback for the incorrect answer
-            st.error(f"Oops! That's not quite right. The correct answer is {current_angle}°.")
-            
-            # Provide detailed feedback for incorrect answers
-            with st.expander("See Step-by-Step Solution", expanded=True):
-                st.markdown(f"""
-                ### Solution Walkthrough:
-                
-                **Step 1:** We know that {current_function}(A) = {current_value}
-                
-                **Step 2:** To find angle A, we need to use the inverse function {current_function}^(-1)
-                
-                **Step 3:** A = {current_function}^(-1)({current_value})
-                
-                **Step 4:** Using a calculator with the {current_function}^(-1) button:
-                - Enter {current_value}
-                - Press {current_function}^(-1)
-                - Result: A = {current_angle}°
-                """)
-            
-            # Add a next question button
-            if st.button("➡️ Next Question", key="next_q3"):
-                # Apply the new question values
-                st.session_state.trig_function = st.session_state.new_trig_function
-                st.session_state.trig_value = st.session_state.new_trig_value
-                st.session_state.angle_deg = st.session_state.new_angle_deg
-                st.session_state.new_q3_ready = False
-                st.rerun()  # Now we can rerun with the new question
-            
-    except ValueError:
-        st.error("Please enter a numeric value for the angle.")
-
-st.markdown("---")
-
-# ASSESSMENT SUMMARY - ONLY SHOW WHEN QUESTION 3 IS COMPLETED
-# Only show assessment summary if all questions are completed or at least question 3 is completed
-if st.session_state.q3_completed:
-    st.header("Assessment Summary")
-
-    # Calculate the final score and progress information
-    completed_count = sum([st.session_state.get("q1_completed", False), 
-                          st.session_state.get("q2_completed", False), 
-                          st.session_state.get("q3_completed", False)])
-    score = st.session_state.current_score
-
-    # Display overall assessment result first
-    st.subheader("📊 Your Placement Recommendation:")
-    if score == 3:
-        st.success("You're ready for Grade 11 math or higher! Great work.")
-    elif score == 2:
-        # Track which question was incorrect
-        missed_topics = []
-        
-        # Check which questions were missed
-        if not st.session_state.get("q1_completed", False):
-            missed_topics.append("Linear Equations")
-        if not st.session_state.get("q2_completed", False):
-            missed_topics.append("Factoring Quadratics")
-        if not st.session_state.get("q3_completed", False):
-            missed_topics.append("Trigonometry")
-            
-        topic_to_review = ", ".join(missed_topics)
-        st.info(f"You can proceed to Grade 11 math, but should first review: {topic_to_review}. Your understanding of other topics is strong!")
-    elif score == 1:
-        st.warning("Consider reviewing foundational Grade 10 topics before moving forward.")
-        
-        # Show which question was correct
-        correct_topic = None
-        if st.session_state.get("q1_completed", False):
-            correct_topic = "Linear Equations"
-        elif st.session_state.get("q2_completed", False):
-            correct_topic = "Factoring Quadratics"
-        elif st.session_state.get("q3_completed", False):
-            correct_topic = "Trigonometry"
-            
-        if correct_topic:
-            st.markdown(f"You demonstrated understanding of **{correct_topic}**. Focus on strengthening the other areas.")
-    else:
-        st.error("We recommend placement in a fundamentals review course (Grade 7–9 topics).")
-
-    # Show detailed assessment information
-    st.markdown("### Assessment Details")
-
-    # Show progress information
-    if completed_count == 0:
-        st.info("You haven't completed any questions yet. Try answering the questions above!")
-    else:
-        st.success(f"You've completed {completed_count} out of 3 questions!")
-        
-        # Show attempts information
-        st.markdown("#### Attempts Information")
-        st.markdown(f"""
-        - Question 1: {st.session_state.get("q1_attempts", 0)} attempt(s)
-        - Question 2: {st.session_state.get("q2_attempts", 0)} attempt(s)
-        - Question 3: {st.session_state.get("q3_attempts", 0)} attempt(s)
-        """)
-        
-        # Show progress on specific topics
-        st.markdown("#### Topic Mastery")
-        topic_cols = st.columns(3)
-        
-        with topic_cols[0]:
-            if st.session_state.get("q1_completed", False):
-                st.markdown("📈 **Linear Equations**: Mastered ✓")
-            else:
-                st.markdown("📉 **Linear Equations**: Not yet mastered")
-                
-        with topic_cols[1]:
-            if st.session_state.get("q2_completed", False):
-                st.markdown("📈 **Factoring**: Mastered ✓") 
-            else:
-                st.markdown("📉 **Factoring**: Not yet mastered")
-                
-        with topic_cols[2]:
-            if st.session_state.get("q3_completed", False):
-                st.markdown("📈 **Trigonometry**: Mastered ✓")
-            else:
-                st.markdown("📉 **Trigonometry**: Not yet mastered")
-                
-    # Create tabs for additional information
-    study_tips_tab, resources_tab, next_steps_tab = st.tabs(["Study Tips", "Resources", "Next Steps"])
-
-    with study_tips_tab:
-        st.markdown("""
-        ### 📚 Study Tips for Grade 10 Math
-        
-        1. **Practice Regularly**: Math skills improve with consistent practice
-        2. **Use Visual Aids**: Draw diagrams to help understand problems
-        3. **Learn Step-by-Step**: Break down complex problems into smaller steps
-        4. **Check Your Work**: Always verify your answers
-        5. **Study Groups**: Work with classmates to discuss challenging topics
-        6. **Online Resources**: Use Khan Academy and other free resources
-        7. **Ask for Help**: Don't hesitate to ask your teacher when you're stuck
-        """)
-
-    with resources_tab:
-        # Provide specific resources for review based on missed topics
-        st.markdown("### 📖 Resources for Your Math Journey")
-        
-        if score < 3:
-            missed_topics = []
-            if not st.session_state.get("q1_completed", False):
-                missed_topics.append("Linear Equations")
-            if not st.session_state.get("q2_completed", False):
-                missed_topics.append("Factoring Quadratics")
-            if not st.session_state.get("q3_completed", False):
-                missed_topics.append("Trigonometry")
-                
-            for topic in missed_topics:
-                if topic == "Linear Equations":
-                    st.markdown("""
-                    #### Linear Equations Resources
-                    - [Khan Academy: Solving Linear Equations](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities)
-                    - Practice with isolating variables and solving step-by-step
-                    """)
-                elif topic == "Factoring Quadratics":
-                    st.markdown("""
-                    #### Factoring Quadratics Resources
-                    - [Khan Academy: Factoring Quadratics](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring)
-                    - Try writing out all pairs of factors for the constant term
-                    """)
-                elif topic == "Trigonometry":
-                    st.markdown("""
-                    #### Trigonometry Resources
-                    - [Khan Academy: Basic Trigonometry](https://www.khanacademy.org/math/trigonometry/trigonometry-right-triangles)
-                    - Practice using your calculator's inverse trigonometric functions
-                    """)
-        else:
-            st.markdown("""
-            Congratulations on mastering all the topics! Here are some advanced resources to further your math skills:
-            
-            - [Khan Academy: Pre-calculus](https://www.khanacademy.org/math/precalculus)
-            - [Khan Academy: Calculus](https://www.khanacademy.org/math/calculus-1)
-            - [Desmos Graphing Calculator](https://www.desmos.com/calculator) for exploring functions
-            """)
-                
-    with next_steps_tab:
-        st.markdown("""
-        ### 🚀 Next Steps
-        
-        Based on your performance in this assessment:
-        
-        1. **Review incorrect answers** using the step-by-step solutions
-        2. **Practice similar problems** to strengthen your understanding
-        3. **Use the AI tutor** to get personalized help on challenging concepts
-        4. **Take the assessment again** after reviewing to see your improvement
-        """)
-        
-        # Offer options based on score
-        if score < 3:
-            # Offer a chance to try new questions
-            if st.button("Try new questions for practice", key="try_new_all"):
-                st.session_state.regenerate_q1 = True
-                st.session_state.regenerate_q2 = True
-                st.session_state.regenerate_q3 = True
-                st.rerun()
