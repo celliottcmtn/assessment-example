@@ -588,36 +588,7 @@ with refresher_col2:
 
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/polynomial-factorization/factoring-quadratics-intro/v/factoring-quadratics-intro)
         """)
-        # Using a placeholder image instead of external URL for better compatibility with Streamlit
-        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
-
-with practice_col3:
-    if st.button("🎮 Practice Similar Problem", key="practice_q3_button"):
-        # Generate a practice trig problem
-        practice_trig_function = random.choice(["sin", "cos", "tan"])
-        
-        if practice_trig_function == "sin":
-            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
-            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
-        elif practice_trig_function == "cos":
-            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
-            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
-        else:  # tan
-            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
-            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
-        
-        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
-        
-        with st.expander("See Solution"):
-            st.markdown(f"""
-            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
-            
-            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}^(-1)({practice_trig_value})
-            
-            **Step 2:** Calculate using calculator: B = {practice_angle}°
-            
-            On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
-            """) URL for better compatibility with Streamlit
+        # Using a placeholder image
         st.markdown("![Factoring quadratics](https://cdn.kastatic.org/ka-perseus-images/5ceff8a3e7416c1c798193baad3d24988a4f15f9.png)")
 
 with practice_col2:
@@ -803,4 +774,33 @@ with refresher_col3:
 
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
         """)
-        # Using a placeholder image instead of external
+        # Using a placeholder image
+        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
+
+with practice_col3:
+    if st.button("🎮 Practice Similar Problem", key="practice_q3_button"):
+        # Generate a practice trig problem
+        practice_trig_function = random.choice(["sin", "cos", "tan"])
+        
+        if practice_trig_function == "sin":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
+        elif practice_trig_function == "cos":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
+        else:  # tan
+            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
+            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
+        
+        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
+        
+        with st.expander("See Solution"):
+            st.markdown(f"""
+            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
+            
+            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}^(-1)({practice_trig_value})
+            
+            **Step 2:** Calculate using calculator: B = {practice_angle}°
+            
+            On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
+            """)with_notations.svg/640px-Triangle_
