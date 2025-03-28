@@ -775,7 +775,7 @@ with refresher_col3:
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
         """)
         # Using a placeholder image
-        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
+        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png", caption="Trigonometric ratios in a right triangle")
 
 with practice_col3:
     if st.button("🎮 Practice Similar Problem", key="practice_q3_button"):
@@ -803,4 +803,4 @@ with practice_col3:
             **Step 2:** Calculate using calculator: B = {practice_angle}°
             
             On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
-            """)with_notations.svg/640px-Triangle_
+            """)
