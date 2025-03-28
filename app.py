@@ -150,7 +150,7 @@ st.sidebar.markdown("""
 """)
 
 # Add reset assessment button
-if st.sidebar.button("🔄 Reset Assessment"):
+if st.sidebar.button("🔄 Reset Assessment", key="reset_assessment"):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
     st.rerun()
@@ -175,7 +175,7 @@ st.latex(f"{st.session_state.coeff}x + {st.session_state.const} = {st.session_st
 
 refresher_col1, practice_col1 = st.columns([1, 1])
 with refresher_col1:
-    if st.button("🔄 Need a refresher for Question 1", key="refresh_q1"):
+    if st.button("🔄 Need a refresher for Question 1", key="refresh_q1_btn"):
         st.markdown("""
         ### 📘 Refresher: Solving Linear Equations
 
@@ -193,7 +193,7 @@ with refresher_col1:
         """)
 
 with practice_col1:
-    if st.button("🎮 Practice Similar Problem", key="practice_q1"):
+    if st.button("🎮 Practice Similar Problem", key="practice_q1_btn"):
         practice_coeff = random.randint(2, 5)
         practice_const = random.randint(1, 10)
         solution = random.randint(2, 5)
@@ -212,14 +212,14 @@ with practice_col1:
             `x = {solution}`
             """)
 
-answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
+answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3_answer")
 
 # Improved AI tutor section for Question 3
 if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_toggle"):
     st.info(f"You can ask questions like 'How do I find an angle from its {st.session_state.trig_function}?' or 'What buttons do I press on my calculator?'")
     q3_ai_input = st.text_area("What would you like to ask about Question 3?", key="q3_ai_text")
     
-    if st.button("Ask AI about Question 3"):
+    if st.button("Ask AI about Question 3", key="q3_ai_btn"):
         if q3_ai_input.strip():
             with st.spinner("Asking AI tutor for help..."):
                 response = client.chat.completions.create(
@@ -243,7 +243,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
             st.info(st.session_state.q3_ai_response)
 
 # Modified Question 3 submit handler
-if st.button("✅ Submit Answer 3"):
+if st.button("✅ Submit Answer 3", key="submit_q3_btn"):
     try:
         st.session_state.q3_attempts += 1
         # Convert answers to float and compare with a small tolerance for rounding errors
@@ -291,7 +291,7 @@ if st.button("✅ Submit Answer 3"):
         
 # Display the Next Question button for Q3 when showing feedback
 if st.session_state.showing_q3_feedback:
-    if st.button("➡️ Next Question", key="next_q3"):
+    if st.button("➡️ Next Question", key="next_q3_btn"):
         # Apply stored next question values
         st.session_state.trig_function = st.session_state.q3_next_function
         st.session_state.trig_value = st.session_state.q3_next_value
@@ -459,7 +459,7 @@ if st.session_state.q1_completed or st.session_state.q2_completed or st.session_
         # Offer options based on score
         if score < 3:
             # Offer a chance to try new questions
-            if st.button("Try new questions for practice", key="try_new_all"):
+            if st.button("Try new questions for practice", key="try_new_all_btn"):
                 # Reset appropriate session state values for regeneration
                 if not st.session_state.q1_completed:
                     st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
@@ -472,14 +472,14 @@ if st.session_state.q1_completed or st.session_state.q2_completed or st.session_
                 
                 st.rerun()
     
-answer1 = st.text_input("Your answer for x:", key="q1")
+answer1 = st.text_input("Your answer for x:", key="q1_answer")
 
 # Improved AI tutor section for Question 1
 if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_toggle"):
     st.info("You can ask questions like 'How do I isolate x?' or 'What's the first step to solve this?'")
     q1_ai_input = st.text_area("What would you like to ask about Question 1?", key="q1_ai_text")
     
-    if st.button("Ask AI about Question 1"):
+    if st.button("Ask AI about Question 1", key="q1_ai_btn"):
         if q1_ai_input.strip():
             with st.spinner("Asking AI tutor for help..."):
                 response = client.chat.completions.create(
@@ -503,7 +503,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
             st.info(st.session_state.q1_ai_response)
 
 # Modified Question 1 submit handler
-if st.button("✅ Submit Answer 1"):
+if st.button("✅ Submit Answer 1", key="submit_q1_btn"):
     try:
         st.session_state.q1_attempts += 1
         if abs(float(answer1) - st.session_state.q1_solution) < 0.01:
@@ -553,7 +553,7 @@ if st.button("✅ Submit Answer 1"):
 
 # Display the Next Question button for Q1 when showing feedback
 if st.session_state.showing_q1_feedback:
-    if st.button("➡️ Next Question", key="next_q1"):
+    if st.button("➡️ Next Question", key="next_q1_btn"):
         # Apply stored next question values
         st.session_state.coeff = st.session_state.q1_next_coeff
         st.session_state.const = st.session_state.q1_next_const
@@ -572,7 +572,7 @@ st.latex(f"x^2 + {st.session_state.trinomial_b}x + {st.session_state.trinomial_c
 
 refresher_col2, practice_col2 = st.columns([1, 1])
 with refresher_col2:
-    if st.button("🔄 Need a refresher for Question 2", key="refresh_q2"):
+    if st.button("🔄 Need a refresher for Question 2", key="refresh_q2_btn"):
         st.markdown("""
         ### 📘 Refresher: Factoring Quadratic Expressions
 
@@ -589,10 +589,39 @@ with refresher_col2:
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/polynomial-factorization/factoring-quadratics-intro/v/factoring-quadratics-intro)
         """)
         # Using a placeholder image instead of external URL for better compatibility with Streamlit
+        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
+
+with practice_col3:
+    if st.button("🎮 Practice Similar Problem", key="practice_q3_btn"):
+        # Generate a practice trig problem
+        practice_trig_function = random.choice(["sin", "cos", "tan"])
+        
+        if practice_trig_function == "sin":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
+        elif practice_trig_function == "cos":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
+        else:  # tan
+            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
+            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
+        
+        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
+        
+        with st.expander("See Solution"):
+            st.markdown(f"""
+            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
+            
+            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}^(-1)({practice_trig_value})
+            
+            **Step 2:** Calculate using calculator: B = {practice_angle}°
+            
+            On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
+            """) URL for better compatibility with Streamlit
         st.markdown("![Factoring quadratics](https://cdn.kastatic.org/ka-perseus-images/5ceff8a3e7416c1c798193baad3d24988a4f15f9.png)")
 
 with practice_col2:
-    if st.button("🎮 Practice Similar Problem", key="practice_q2"):
+    if st.button("🎮 Practice Similar Problem", key="practice_q2_btn"):
         # Generate a simple practice problem
         practice_r1, practice_r2 = random.choice([(1, 3), (2, 4), (2, 5), (-1, -3), (-2, 5)])
         practice_b = practice_r1 + practice_r2
@@ -613,7 +642,7 @@ with practice_col2:
             **Step 2:** The factored form is (x + {practice_r1})(x + {practice_r2})
             """)
 
-answer2 = st.text_input("Your factored expression:", key="q2")
+answer2 = st.text_input("Your factored expression:", key="q2_answer")
 
 # Define correct factored answers for this problem
 r1, r2 = st.session_state.r1, st.session_state.r2
@@ -626,7 +655,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
     st.info("You can ask questions like 'How do I factor this?' or 'What numbers multiply to give the constant term?'")
     q2_ai_input = st.text_area("What would you like to ask about Question 2?", key="q2_ai_text")
     
-    if st.button("Ask AI about Question 2"):
+    if st.button("Ask AI about Question 2", key="q2_ai_btn"):
         if q2_ai_input.strip():
             with st.spinner("Asking AI tutor for help..."):
                 response = client.chat.completions.create(
@@ -650,7 +679,7 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             st.info(st.session_state.q2_ai_response)
 
 # Modified Question 2 submit handler
-if st.button("✅ Submit Answer 2"):
+if st.button("✅ Submit Answer 2", key="submit_q2_btn"):
     try:
         st.session_state.q2_attempts += 1
         simplified = answer2.replace(" ", "")
@@ -707,7 +736,7 @@ if st.button("✅ Submit Answer 2"):
 
 # Display the Next Question button for Q2 when showing feedback
 if st.session_state.showing_q2_feedback:
-    if st.button("➡️ Next Question", key="next_q2"):
+    if st.button("➡️ Next Question", key="next_q2_btn"):
         # Apply stored next question values
         st.session_state.r1 = st.session_state.q2_next_r1
         st.session_state.r2 = st.session_state.q2_next_r2
@@ -741,7 +770,7 @@ st.markdown("""
 """)
 
 # Option to reveal the answer
-if st.button("Show me the calculation result"):
+if st.button("Show me the calculation result", key="show_result_q3_btn"):
     st.session_state.calculated_angle = st.session_state.angle_deg
     st.success(f"Result: {st.session_state.angle_deg}°")
 
@@ -760,7 +789,7 @@ On a scientific calculator:
 
 refresher_col3, practice_col3 = st.columns([1, 1])
 with refresher_col3:
-    if st.button("🔄 Need a refresher for Question 3", key="refresh_q3"):
+    if st.button("🔄 Need a refresher for Question 3", key="refresh_q3_btn"):
         st.markdown(f"""
         ### 📘 Refresher: Using {st.session_state.trig_function.capitalize()} to Find Angles
 
@@ -774,33 +803,4 @@ with refresher_col3:
 
         📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
         """)
-        # Using a placeholder image instead of external URL for better compatibility with Streamlit
-        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
-
-with practice_col3:
-    if st.button("🎮 Practice Similar Problem", key="practice_q3"):
-        # Generate a practice trig problem
-        practice_trig_function = random.choice(["sin", "cos", "tan"])
-        
-        if practice_trig_function == "sin":
-            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
-            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
-        elif practice_trig_function == "cos":
-            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
-            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
-        else:  # tan
-            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
-            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
-        
-        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
-        
-        with st.expander("See Solution"):
-            st.markdown(f"""
-            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
-            
-            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}^(-1)({practice_trig_value})
-            
-            **Step 2:** Calculate using calculator: B = {practice_angle}°
-            
-            On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
-            """)
+        # Using a placeholder image instead of external
