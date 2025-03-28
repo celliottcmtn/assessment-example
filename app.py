@@ -88,6 +88,15 @@ def generate_linear_equation():
     rhs = coeff * solution + const
     return coeff, const, rhs, solution
 
+# Function to generate new question for Q1 and store it
+def generate_new_q1():
+    old_solution = st.session_state.q1_solution
+    while True:
+        new_coeff, new_const, new_rhs, new_solution = generate_linear_equation()
+        if new_solution != old_solution:
+            break
+    return new_coeff, new_const, new_rhs, new_solution
+
 # Initialize random values in session state
 if "coeff" not in st.session_state:
     st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
@@ -164,16 +173,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q3_ai_response)
-
-# Function to generate new question for Q3 and store it
-def generate_new_q3():
-    old_function = st.session_state.trig_function
-    old_value = st.session_state.trig_value
-    while True:
-        new_trig_function, new_trig_value, new_angle_deg = generate_trig_problem()
-        if (new_trig_function != old_function or new_trig_value != old_value):
-            break
-    return new_trig_function, new_trig_value, new_angle_deg
 
 # Modified Question 3 submit handler
 if st.button("✅ Submit Answer 3"):
@@ -438,15 +437,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_to
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q1_ai_response)
 
-# Function to generate new question for Q1 and store it
-def generate_new_q1():
-    old_solution = st.session_state.q1_solution
-    while True:
-        new_coeff, new_const, new_rhs, new_solution = generate_linear_equation()
-        if new_solution != old_solution:
-            break
-    return new_coeff, new_const, new_rhs, new_solution
-
 # Modified Question 1 submit handler
 if st.button("✅ Submit Answer 1"):
     try:
@@ -524,6 +514,15 @@ def generate_factoring_problem():
     trinomial_b = r1 + r2
     trinomial_c = r1 * r2
     return r1, r2, trinomial_b, trinomial_c
+
+# Function to generate new question for Q2 and store it
+def generate_new_q2():
+    old_r1, old_r2 = st.session_state.r1, st.session_state.r2
+    while True:
+        new_r1, new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
+        if (new_r1 != old_r1 or new_r2 != old_r2):
+            break
+    return new_r1, new_r2, new_trinomial_b, new_trinomial_c
 
 # Initialize factoring problem
 if "r1" not in st.session_state:
@@ -612,15 +611,6 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q2_ai_to
             st.markdown("### 👨‍🏫 AI Tutor Help")
             st.info(st.session_state.q2_ai_response)
 
-# Function to generate new question for Q2 and store it
-def generate_new_q2():
-    old_r1, old_r2 = st.session_state.r1, st.session_state.r2
-    while True:
-        new_r1, new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
-        if (new_r1 != old_r1 or new_r2 != old_r2):
-            break
-    return new_r1, new_r2, new_trinomial_b, new_trinomial_c
-
 # Modified Question 2 submit handler
 if st.button("✅ Submit Answer 2"):
     try:
@@ -708,6 +698,16 @@ def generate_trig_problem():
         angle_deg = round(math.degrees(math.atan(trig_value)), 2)
     
     return trig_function, trig_value, angle_deg
+
+# Function to generate new question for Q3 and store it
+def generate_new_q3():
+    old_function = st.session_state.trig_function
+    old_value = st.session_state.trig_value
+    while True:
+        new_trig_function, new_trig_value, new_angle_deg = generate_trig_problem()
+        if (new_trig_function != old_function or new_trig_value != old_value):
+            break
+    return new_trig_function, new_trig_value, new_angle_deg
 
 # Initialize trigonometry problem
 if "trig_function" not in st.session_state:
