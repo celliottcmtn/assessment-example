@@ -30,13 +30,13 @@ if "q2_attempts" not in st.session_state:
 if "q3_attempts" not in st.session_state:
     st.session_state.q3_attempts = 0
 
-# Add feedback state tracking
-if "q1_show_feedback" not in st.session_state:
-    st.session_state.q1_show_feedback = False
-if "q2_show_feedback" not in st.session_state:
-    st.session_state.q2_show_feedback = False
-if "q3_show_feedback" not in st.session_state:
-    st.session_state.q3_show_feedback = False
+# Initialize new question ready flags
+if "new_q1_ready" not in st.session_state:
+    st.session_state.new_q1_ready = False
+if "new_q2_ready" not in st.session_state:
+    st.session_state.new_q2_ready = False
+if "new_q3_ready" not in st.session_state:
+    st.session_state.new_q3_ready = False
 
 # Display progress indicators
 with col1:
@@ -71,73 +71,79 @@ st.sidebar.markdown("""
 - Click the 'Need a refresher?' button for a quick lesson
 - Use the AI tutor for personalized help
 - Step-by-step solutions appear after submitting
+""")
 
+# Add reset assessment button
+if st.sidebar.button("🔄 Reset Assessment"):
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.rerun()
 
-st.markdown("#### Online Calculator Tools")
-st.markdown("""
-[Desmos Scientific Calculator](https://www.desmos.com/scientific)
+# QUESTION 1: LINEAR EQUATION
+# Function to generate a new linear equation
+def generate_linear_equation():
+    coeff = random.randint(2, 8)
+    solution = random.randint(-5, 10)  # Random solution value
+    const = random.randint(-10, 15)
+    rhs = coeff * solution + const
+    return coeff, const, rhs, solution
 
-[GeoGebra Scientific Calculator](https://www.geogebra.org/scientific)
+# Initialize random values in session state or regenerate when needed
+if "coeff" not in st.session_state or st.session_state.get("regenerate_q1", False):
+    st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
+    st.session_state.regenerate_q1 = False
+st.header("Question 1: Solving Linear Equations")
+st.markdown(f"**Solve for x in the equation below:**")
+st.latex(f"{st.session_state.coeff}x + {st.session_state.const} = {st.session_state.rhs}")
 
-[web2.0calc Scientific Calculator](https://web2.0calc.com/)
+refresher_col1, practice_col1 = st.columns([1, 1])
+with refresher_col1:
+    if st.button("🔄 Need a refresher for Question 1", key="refresh_q1"):
+        st.markdown("""
+        ### 📘 Refresher: Solving Linear Equations
 
+        A linear equation like `3x + 4 = 13` can be solved in two simple steps:
 
-refresher_col3, practice_col3 = st.columns([1, 1])
-with refresher_col3:
-    if st.button("🔄 Need a refresher for Question 3", key="refresh_q3"):
-        st.markdown(f"""
-        ### 📘 Refresher: Using {st.session_state.trig_function.capitalize()} to Find Angles
+        **Step 1:** Subtract 4 from both sides  
+        `3x + 4 - 4 = 13 - 4` → `3x = 9`
 
-        If you know the {st.session_state.trig_function} of an angle, like `{st.session_state.trig_function}(A) = {st.session_state.trig_value}`, you can find the angle using your calculator:
+        **Step 2:** Divide both sides by 3  
+        `3x / 3 = 9 / 3` → `x = 3`
 
-        **Step 1:** Press the `{st.session_state.trig_function}^(-1)` (also called `arc{st.session_state.trig_function}`) button  
-        **Step 2:** Enter the value → `{st.session_state.trig_function}^(-1)({st.session_state.trig_value})`  
-        **Result:** `A = {st.session_state.angle_deg}°`
+        🧠 The goal is to isolate `x` by undoing the operations in reverse order.
 
-        🧠 This is often used in right triangles when you know the ratio of sides.
-
-        📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
+        📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/solving-linear-equations)
         """)
-        # Using a placeholder image instead of external URL for better compatibility with Streamlit
-        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
 
-with practice_col3:
-    if st.button("🎮 Practice Similar Problem", key="practice_q3"):
-        # Generate a practice trig problem
-        practice_trig_function = random.choice(["sin", "cos", "tan"])
+with practice_col1:
+    if st.button("🎮 Practice Similar Problem", key="practice_q1"):
+        practice_coeff = random.randint(2, 5)
+        practice_const = random.randint(1, 10)
+        solution = random.randint(2, 5)
+        practice_rhs = practice_coeff * solution + practice_const
         
-        if practice_trig_function == "sin":
-            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
-            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
-        elif practice_trig_function == "cos":
-            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
-            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
-        else:  # tan
-            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
-            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
-        
-        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
+        st.markdown(f"**Practice Problem:** Solve for x in {practice_coeff}x + {practice_const} = {practice_rhs}")
         
         with st.expander("See Solution"):
             st.markdown(f"""
-            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
+            **Step 1:** Subtract {practice_const} from both sides  
+            `{practice_coeff}x + {practice_const} - {practice_const} = {practice_rhs} - {practice_const}`  
+            `{practice_coeff}x = {practice_rhs - practice_const}`
             
-            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}^(-1)({practice_trig_value})
-            
-            **Step 2:** Calculate using calculator: B = {practice_angle}°
-            
-            On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
+            **Step 2:** Divide both sides by {practice_coeff}  
+            `{practice_coeff}x ÷ {practice_coeff} = {practice_rhs - practice_const} ÷ {practice_coeff}`  
+            `x = {solution}`
             """)
-
-answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
-
-# Improved AI tutor section for Question 3
-if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_toggle"):
-    st.info(f"You can ask questions like 'How do I find an angle from its {st.session_state.trig_function}?' or 'What buttons do I press on my calculator?'")
-    q3_ai_input = st.text_area("What would you like to ask about Question 3?", key="q3_ai_text")
     
-    if st.button("Ask AI about Question 3"):
-        if q3_ai_input.strip():
+answer1 = st.text_input("Your answer for x:", key="q1")
+
+# Improved AI tutor section for Question 1
+if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_toggle"):
+    st.info("You can ask questions like 'How do I isolate x?' or 'What's the first step to solve this?'")
+    q1_ai_input = st.text_area("What would you like to ask about Question 1?", key="q1_ai_text")
+    
+    if st.button("Ask AI about Question 1"):
+        if q1_ai_input.strip():
             with st.spinner("Asking AI tutor for help..."):
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
@@ -148,12 +154,12 @@ if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_to
                         },
                         {
                             "role": "user",
-                            "content": f"I'm trying to find the angle A in degrees when {st.session_state.trig_function}(A) = {st.session_state.trig_value}. {q3_ai_input}"
+                            "content": f"I'm solving this linear equation: {st.session_state.coeff}x + {st.session_state.const} = {st.session_state.rhs}. {q1_ai_input}"
                         }
                     ]
                 )
                 # Store AI response in session state
-                st.session_state.q3_ai_response = response.choices[0].message.content
+                st.session_state.q1_ai_response = response.choices[0].message.content
             
             # Display the response from session state in a nicer format
             st.markdown("### 👨‍🏫 AI Tutor Help")
@@ -171,7 +177,53 @@ if st.button("✅ Submit Answer 3"):
                 if not st.session_state.get("q3_already_scored", False):
                     st.session_state.current_score += 1
                     st.session_state.q3_already_scored = True
-                    st.rerun()
+                    st.rerun()  # Rerun for correct answers
+        else:
+            # Store current values for feedback
+            current_function = st.session_state.trig_function
+            current_value = st.session_state.trig_value
+            current_angle = st.session_state.angle_deg
+            
+            # Generate a new problem for next attempt (but don't rerun)
+            st.session_state.new_q3_ready = True
+            old_function = current_function
+            old_value = current_value
+            while True:
+                st.session_state.new_trig_function, st.session_state.new_trig_value, st.session_state.new_angle_deg = generate_trig_problem()
+                if (st.session_state.new_trig_function != old_function or st.session_state.new_trig_value != old_value):
+                    break
+            
+            # Show feedback for the incorrect answer
+            st.error(f"Oops! That's not quite right. The correct answer is {current_angle}°.")
+            
+            # Provide detailed feedback for incorrect answers
+            with st.expander("See Step-by-Step Solution", expanded=True):
+                st.markdown(f"""
+                ### Solution Walkthrough:
+                
+                **Step 1:** We know that {current_function}(A) = {current_value}
+                
+                **Step 2:** To find angle A, we need to use the inverse function {current_function}^(-1)
+                
+                **Step 3:** A = {current_function}^(-1)({current_value})
+                
+                **Step 4:** Using a calculator with the {current_function}^(-1) button:
+                - Enter {current_value}
+                - Press {current_function}^(-1)
+                - Result: A = {current_angle}°
+                """)
+            
+            # Add a next question button
+            if st.button("➡️ Next Question", key="next_q3"):
+                # Apply the new question values
+                st.session_state.trig_function = st.session_state.new_trig_function
+                st.session_state.trig_value = st.session_state.new_trig_value
+                st.session_state.angle_deg = st.session_state.new_angle_deg
+                st.session_state.new_q3_ready = False
+                st.rerun()  # Now we can rerun with the new question
+            
+    except ValueError:
+        st.error("Please enter a numeric value for the angle.")
 
 st.markdown("---")
 
@@ -336,197 +388,7 @@ if st.session_state.q3_completed:
                 st.session_state.regenerate_q1 = True
                 st.session_state.regenerate_q2 = True
                 st.session_state.regenerate_q3 = True
-                st.rerun()  # Rerun for correct answers
-        else:
-            # Store current values for feedback
-            current_function = st.session_state.trig_function
-            current_value = st.session_state.trig_value
-            current_angle = st.session_state.angle_deg
-            
-            # Store a flag to show the solution feedback
-            st.session_state.q3_show_feedback = True
-            st.session_state.q3_old_function = current_function
-            st.session_state.q3_old_value = current_value
-            st.session_state.q3_old_angle = current_angle
-            
-            # Show feedback for the incorrect answer
-            st.error(f"Oops! That's not quite right. The correct answer is {current_angle}°.")
-            
-            # Provide detailed feedback for incorrect answers
-            with st.expander("See Step-by-Step Solution", expanded=True):
-                st.markdown(f"""
-                ### Solution Walkthrough:
-                
-                **Step 1:** We know that {current_function}(A) = {current_value}
-                
-                **Step 2:** To find angle A, we need to use the inverse function {current_function}^(-1)
-                
-                **Step 3:** A = {current_function}^(-1)({current_value})
-                
-                **Step 4:** Using a calculator with the {current_function}^(-1) button:
-                - Enter {current_value}
-                - Press {current_function}^(-1)
-                - Result: A = {current_angle}°
-                """)
-            
-            # Add a next question button instead of automatically generating
-            if st.button("➡️ Next Question", key="next_q3"):
-                # Generate a new problem for next attempt
-                old_function = current_function
-                old_value = current_value
-                while True:
-                    st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
-                    if (st.session_state.trig_function != old_function or st.session_state.trig_value != old_value):
-                        break
-                # Clear the feedback flag
-                st.session_state.q3_show_feedback = False
-                st.rerun()
-            
-    except ValueError:
-        st.error("Please enter a numeric value for the angle.")
-
-# Display persistent feedback if it exists from a previous attempt
-if st.session_state.get("q3_show_feedback", False):
-    st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q3_old_angle}°.")
-    
-    # Provide detailed feedback for incorrect answers
-    with st.expander("See Step-by-Step Solution", expanded=True):
-        st.markdown(f"""
-        ### Solution Walkthrough:
-        
-        **Step 1:** We know that {st.session_state.q3_old_function}(A) = {st.session_state.q3_old_value}
-        
-        **Step 2:** To find angle A, we need to use the inverse function {st.session_state.q3_old_function}^(-1)
-        
-        **Step 3:** A = {st.session_state.q3_old_function}^(-1)({st.session_state.q3_old_value})
-        
-        **Step 4:** Using a calculator with the {st.session_state.q3_old_function}^(-1) button:
-        - Enter {st.session_state.q3_old_value}
-        - Press {st.session_state.q3_old_function}^(-1)
-        - Result: A = {st.session_state.q3_old_angle}°
-        """)
-    
-    # Add a next question button
-    if st.button("➡️ Next Question", key="next_q3_persistent"):
-        # Generate a new problem for next attempt
-        old_function = st.session_state.q3_old_function
-        old_value = st.session_state.q3_old_value
-        while True:
-            st.session_state.trig_function, st.session_state.trig_value, st.session_state.angle_deg = generate_trig_problem()
-            if (st.session_state.trig_function != old_function or st.session_state.trig_value != old_value):
-                break
-        # Clear the feedback flag
-        st.session_state.q3_show_feedback = False
-        st.rerun()
-
-# Option to reveal the answer
-if st.button("Show me the calculation result"):
-    st.session_state.calculated_angle = st.session_state.angle_deg
-    st.success(f"Result: {st.session_state.angle_deg}°")
-
-if "calculated_angle" in st.session_state:
-    st.info(f"You can use this value as your answer: {st.session_state.calculated_angle}°")
-
-# Calculator tips
-st.markdown(f"""
-### Calculator Tips
-
-On a scientific calculator:
-1. Enter {st.session_state.trig_value}
-2. Press the {st.session_state.trig_function}^(-1) button (or 2nd function + {st.session_state.trig_function})
-3. Read the angle in degrees (make sure calculator is in degree mode)
-""")
-
-# Add reset assessment button
-if st.sidebar.button("🔄 Reset Assessment"):
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-    st.rerun()
-
-# QUESTION 1: LINEAR EQUATION
-# Function to generate a new linear equation
-def generate_linear_equation():
-    coeff = random.randint(2, 8)
-    solution = random.randint(-5, 10)  # Random solution value
-    const = random.randint(-10, 15)
-    rhs = coeff * solution + const
-    return coeff, const, rhs, solution
-
-# Initialize random values in session state or regenerate when needed
-if "coeff" not in st.session_state or st.session_state.get("regenerate_q1", False):
-    st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
-    st.session_state.regenerate_q1 = False
-st.header("Question 1: Solving Linear Equations")
-st.markdown(f"**Solve for x in the equation below:**")
-st.latex(f"{st.session_state.coeff}x + {st.session_state.const} = {st.session_state.rhs}")
-
-refresher_col1, practice_col1 = st.columns([1, 1])
-with refresher_col1:
-    if st.button("🔄 Need a refresher for Question 1", key="refresh_q1"):
-        st.markdown("""
-        ### 📘 Refresher: Solving Linear Equations
-
-        A linear equation like `3x + 4 = 13` can be solved in two simple steps:
-
-        **Step 1:** Subtract 4 from both sides  
-        `3x + 4 - 4 = 13 - 4` → `3x = 9`
-
-        **Step 2:** Divide both sides by 3  
-        `3x / 3 = 9 / 3` → `x = 3`
-
-        🧠 The goal is to isolate `x` by undoing the operations in reverse order.
-
-        📺 [Watch on Khan Academy](https://www.khanacademy.org/math/algebra/solving-linear-equations)
-        """)
-
-with practice_col1:
-    if st.button("🎮 Practice Similar Problem", key="practice_q1"):
-        practice_coeff = random.randint(2, 5)
-        practice_const = random.randint(1, 10)
-        solution = random.randint(2, 5)
-        practice_rhs = practice_coeff * solution + practice_const
-        
-        st.markdown(f"**Practice Problem:** Solve for x in {practice_coeff}x + {practice_const} = {practice_rhs}")
-        
-        with st.expander("See Solution"):
-            st.markdown(f"""
-            **Step 1:** Subtract {practice_const} from both sides  
-            `{practice_coeff}x + {practice_const} - {practice_const} = {practice_rhs} - {practice_const}`  
-            `{practice_coeff}x = {practice_rhs - practice_const}`
-            
-            **Step 2:** Divide both sides by {practice_coeff}  
-            `{practice_coeff}x ÷ {practice_coeff} = {practice_rhs - practice_const} ÷ {practice_coeff}`  
-            `x = {solution}`
-            """)
-    
-answer1 = st.text_input("Your answer for x:", key="q1")
-
-# Improved AI tutor section for Question 1
-if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q1_ai_toggle"):
-    st.info("You can ask questions like 'How do I isolate x?' or 'What's the first step to solve this?'")
-    q1_ai_input = st.text_area("What would you like to ask about Question 1?", key="q1_ai_text")
-    
-    if st.button("Ask AI about Question 1"):
-        if q1_ai_input.strip():
-            with st.spinner("Asking AI tutor for help..."):
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are a helpful math tutor for a Grade 10 student. Provide clear, step-by-step guidance without giving away the complete answer. Use encouraging language and scaffold your explanation so the student understands the process. Keep explanations under 150 words, use simple language, and focus on building understanding rather than just the solution."
-                        },
-                        {
-                            "role": "user",
-                            "content": f"I'm solving this linear equation: {st.session_state.coeff}x + {st.session_state.const} = {st.session_state.rhs}. {q1_ai_input}"
-                        }
-                    ]
-                )
-                # Store AI response in session state
-                st.session_state.q1_ai_response = response.choices[0].message.content
-            
-            # Display the response from session state in a nicer format
-            st.markdown("### 👨‍🏫 AI Tutor Help")
+                st.rerun() Tutor Help")
             st.info(st.session_state.q1_ai_response)
 
 # Modified Question 1 submit handler
@@ -548,12 +410,13 @@ if st.button("✅ Submit Answer 1"):
             current_const = st.session_state.const
             current_rhs = st.session_state.rhs
             
-            # Store a flag to show the solution feedback
-            st.session_state.q1_show_feedback = True
-            st.session_state.q1_old_solution = current_solution
-            st.session_state.q1_old_coeff = current_coeff
-            st.session_state.q1_old_const = current_const
-            st.session_state.q1_old_rhs = current_rhs
+            # Generate a new problem for next attempt (but don't rerun)
+            st.session_state.new_q1_ready = True
+            old_solution = current_solution
+            while True:
+                st.session_state.new_coeff, st.session_state.new_const, st.session_state.new_rhs, st.session_state.new_q1_solution = generate_linear_equation()
+                if st.session_state.new_q1_solution != old_solution:
+                    break
             
             # Show feedback for the incorrect answer
             st.error(f"Oops! That's not quite right. The correct answer is {current_solution}.")
@@ -576,54 +439,18 @@ if st.button("✅ Submit Answer 1"):
                 `{current_coeff * current_solution + current_const} = {current_rhs}` ✓
                 """)
                 
-            # Add a next question button instead of automatically generating
+            # Add a next question button
             if st.button("➡️ Next Question", key="next_q1"):
-                # Generate a new problem for next attempt
-                old_solution = current_solution
-                while True:
-                    st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
-                    if st.session_state.q1_solution != old_solution:
-                        break
-                # Clear the feedback flag
-                st.session_state.q1_show_feedback = False
-                st.rerun()
+                # Apply the new question values
+                st.session_state.coeff = st.session_state.new_coeff
+                st.session_state.const = st.session_state.new_const
+                st.session_state.rhs = st.session_state.new_rhs
+                st.session_state.q1_solution = st.session_state.new_q1_solution
+                st.session_state.new_q1_ready = False
+                st.rerun()  # Now we can rerun with the new question
             
     except ValueError:
         st.error("Please enter a numeric value.")
-
-# Display persistent feedback if it exists from a previous attempt
-if st.session_state.get("q1_show_feedback", False):
-    st.error(f"Oops! That's not quite right. The correct answer is {st.session_state.q1_old_solution}.")
-    
-    # Provide detailed feedback for incorrect answers
-    with st.expander("See Step-by-Step Solution", expanded=True):
-        st.markdown(f"""
-        ### Solution Walkthrough:
-        
-        **Step 1:** Subtract {st.session_state.q1_old_const} from both sides  
-        `{st.session_state.q1_old_coeff}x + {st.session_state.q1_old_const} - {st.session_state.q1_old_const} = {st.session_state.q1_old_rhs} - {st.session_state.q1_old_const}`  
-        `{st.session_state.q1_old_coeff}x = {st.session_state.q1_old_rhs - st.session_state.q1_old_const}`
-        
-        **Step 2:** Divide both sides by {st.session_state.q1_old_coeff}  
-        `{st.session_state.q1_old_coeff}x ÷ {st.session_state.q1_old_coeff} = {st.session_state.q1_old_rhs - st.session_state.q1_old_const} ÷ {st.session_state.q1_old_coeff}`  
-        `x = {st.session_state.q1_old_solution}`
-        
-        **Check:** Substitute x = {st.session_state.q1_old_solution} back into the original equation  
-        `{st.session_state.q1_old_coeff} × {st.session_state.q1_old_solution} + {st.session_state.q1_old_const} = {st.session_state.q1_old_coeff * st.session_state.q1_old_solution + st.session_state.q1_old_const}`  
-        `{st.session_state.q1_old_coeff * st.session_state.q1_old_solution + st.session_state.q1_old_const} = {st.session_state.q1_old_rhs}` ✓
-        """)
-        
-    # Add a next question button 
-    if st.button("➡️ Next Question", key="next_q1_persistent"):
-        # Generate a new problem for next attempt
-        old_solution = st.session_state.q1_old_solution
-        while True:
-            st.session_state.coeff, st.session_state.const, st.session_state.rhs, st.session_state.q1_solution = generate_linear_equation()
-            if st.session_state.q1_solution != old_solution:
-                break
-        # Clear the feedback flag
-        st.session_state.q1_show_feedback = False
-        st.rerun()
 
 st.markdown("---")
 
@@ -754,12 +581,15 @@ if st.button("✅ Submit Answer 2"):
         current_b = st.session_state.trinomial_b
         current_c = st.session_state.trinomial_c
         
-        # Store a flag to show the solution feedback
-        st.session_state.q2_show_feedback = True
-        st.session_state.q2_old_r1 = current_r1
-        st.session_state.q2_old_r2 = current_r2
-        st.session_state.q2_old_b = current_b
-        st.session_state.q2_old_c = current_c
+        # Generate a new problem for next attempt (but don't rerun)
+        st.session_state.new_q2_ready = True
+        old_r1, old_r2 = current_r1, current_r2
+        while True:
+            st.session_state.new_r1, st.session_state.new_r2, new_trinomial_b, new_trinomial_c = generate_factoring_problem()
+            st.session_state.new_trinomial_b = new_trinomial_b
+            st.session_state.new_trinomial_c = new_trinomial_c
+            if (st.session_state.new_r1 != old_r1 or st.session_state.new_r2 != old_r2):
+                break
         
         # Show feedback for the incorrect answer
         st.error(f"❌ Not quite. One correct answer is (x + {current_r1})(x + {current_r2}).")
@@ -788,61 +618,15 @@ if st.button("✅ Submit Answer 2"):
             So (x + {current_r1})(x + {current_r2}) = x² + {current_b}x + {current_c} ✓
             """)
         
-        # Add a next question button instead of automatically generating
+        # Add a next question button
         if st.button("➡️ Next Question", key="next_q2"):
-            # Generate a new problem for next attempt
-            old_r1, old_r2 = current_r1, current_r2
-            while True:
-                st.session_state.r1, st.session_state.r2, trinomial_b, trinomial_c = generate_factoring_problem()
-                st.session_state.trinomial_b = trinomial_b
-                st.session_state.trinomial_c = trinomial_c
-                if (st.session_state.r1 != old_r1 or st.session_state.r2 != old_r2):
-                    break
-            # Clear the feedback flag
-            st.session_state.q2_show_feedback = False
-            st.rerun()
-
-# Display persistent feedback if it exists from a previous attempt
-if st.session_state.get("q2_show_feedback", False):
-    st.error(f"❌ Not quite. One correct answer is (x + {st.session_state.q2_old_r1})(x + {st.session_state.q2_old_r2}).")
-    
-    # Provide detailed feedback for incorrect answers
-    with st.expander("See Step-by-Step Solution", expanded=True):
-        st.markdown(f"""
-        ### Solution Walkthrough:
-        
-        **Step 1:** For the trinomial `x² + {st.session_state.q2_old_b}x + {st.session_state.q2_old_c}`, find two numbers that:
-        - Multiply to give {st.session_state.q2_old_c}
-        - Add to give {st.session_state.q2_old_b}
-        
-        **Step 2:** The numbers {st.session_state.q2_old_r1} and {st.session_state.q2_old_r2} work because:
-        - {st.session_state.q2_old_r1} × {st.session_state.q2_old_r2} = {st.session_state.q2_old_r1 * st.session_state.q2_old_r2}
-        - {st.session_state.q2_old_r1} + {st.session_state.q2_old_r2} = {st.session_state.q2_old_r1 + st.session_state.q2_old_r2}
-        
-        **Step 3:** Write the factored form:
-        - (x + {st.session_state.q2_old_r1})(x + {st.session_state.q2_old_r2})
-        
-        **Check:** Multiply it out to verify:
-        - First term: x × x = x²
-        - Middle terms: x × {st.session_state.q2_old_r2} + {st.session_state.q2_old_r1} × x = {st.session_state.q2_old_r2}x + {st.session_state.q2_old_r1}x = {st.session_state.q2_old_r1 + st.session_state.q2_old_r2}x
-        - Last term: {st.session_state.q2_old_r1} × {st.session_state.q2_old_r2} = {st.session_state.q2_old_r1 * st.session_state.q2_old_r2}
-        
-        So (x + {st.session_state.q2_old_r1})(x + {st.session_state.q2_old_r2}) = x² + {st.session_state.q2_old_b}x + {st.session_state.q2_old_c} ✓
-        """)
-    
-    # Add a next question button
-    if st.button("➡️ Next Question", key="next_q2_persistent"):
-        # Generate a new problem for next attempt
-        old_r1, old_r2 = st.session_state.q2_old_r1, st.session_state.q2_old_r2
-        while True:
-            st.session_state.r1, st.session_state.r2, trinomial_b, trinomial_c = generate_factoring_problem()
-            st.session_state.trinomial_b = trinomial_b
-            st.session_state.trinomial_c = trinomial_c
-            if (st.session_state.r1 != old_r1 or st.session_state.r2 != old_r2):
-                break
-        # Clear the feedback flag
-        st.session_state.q2_show_feedback = False
-        st.rerun()
+            # Apply the new question values
+            st.session_state.r1 = st.session_state.new_r1
+            st.session_state.r2 = st.session_state.new_r2 
+            st.session_state.trinomial_b = st.session_state.new_trinomial_b
+            st.session_state.trinomial_c = st.session_state.new_trinomial_c
+            st.session_state.new_q2_ready = False
+            st.rerun()  # Now we can rerun with the new question
 
 st.markdown("---")
 
@@ -879,3 +663,106 @@ To solve this problem:
 2. That is, calculate {st.session_state.trig_function}^(-1)({st.session_state.trig_value})
 3. Use the online calculator linked below (make sure it's in degree mode)
 """)
+
+st.markdown("#### Online Calculator Tools")
+st.markdown("""
+[Desmos Scientific Calculator](https://www.desmos.com/scientific)
+
+[GeoGebra Scientific Calculator](https://www.geogebra.org/scientific)
+
+[web2.0calc Scientific Calculator](https://web2.0calc.com/)
+""")
+
+# Option to reveal the answer
+if st.button("Show me the calculation result"):
+    st.session_state.calculated_angle = st.session_state.angle_deg
+    st.success(f"Result: {st.session_state.angle_deg}°")
+
+if "calculated_angle" in st.session_state:
+    st.info(f"You can use this value as your answer: {st.session_state.calculated_angle}°")
+
+# Calculator tips
+st.markdown(f"""
+### Calculator Tips
+
+On a scientific calculator:
+1. Enter {st.session_state.trig_value}
+2. Press the {st.session_state.trig_function}^(-1) button (or 2nd function + {st.session_state.trig_function})
+3. Read the angle in degrees (make sure calculator is in degree mode)
+""")
+
+refresher_col3, practice_col3 = st.columns([1, 1])
+with refresher_col3:
+    if st.button("🔄 Need a refresher for Question 3", key="refresh_q3"):
+        st.markdown(f"""
+        ### 📘 Refresher: Using {st.session_state.trig_function.capitalize()} to Find Angles
+
+        If you know the {st.session_state.trig_function} of an angle, like `{st.session_state.trig_function}(A) = {st.session_state.trig_value}`, you can find the angle using your calculator:
+
+        **Step 1:** Press the `{st.session_state.trig_function}^(-1)` (also called `arc{st.session_state.trig_function}`) button  
+        **Step 2:** Enter the value → `{st.session_state.trig_function}^(-1)({st.session_state.trig_value})`  
+        **Result:** `A = {st.session_state.angle_deg}°`
+
+        🧠 This is often used in right triangles when you know the ratio of sides.
+
+        📺 [Watch on Khan Academy](https://www.khanacademy.org/math/geometry/hs-geo-trig/hs-geo-trig-ratios/v/using-trig-ratios-to-solve-right-triangles)
+        """)
+        # Using a placeholder image instead of external URL for better compatibility with Streamlit
+        st.markdown("![Trig ratios](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Triangle_with_notations.svg/640px-Triangle_with_notations.svg.png)")
+
+with practice_col3:
+    if st.button("🎮 Practice Similar Problem", key="practice_q3"):
+        # Generate a practice trig problem
+        practice_trig_function = random.choice(["sin", "cos", "tan"])
+        
+        if practice_trig_function == "sin":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.asin(practice_trig_value)), 2)
+        elif practice_trig_function == "cos":
+            practice_trig_value = round(random.uniform(0.1, 0.95), 2)
+            practice_angle = round(math.degrees(math.acos(practice_trig_value)), 2)
+        else:  # tan
+            practice_trig_value = round(random.uniform(0.1, 2.0), 2)
+            practice_angle = round(math.degrees(math.atan(practice_trig_value)), 2)
+        
+        st.markdown(f"**Practice Problem:** Find angle B in degrees where {practice_trig_function}(B) = {practice_trig_value}")
+        
+        with st.expander("See Solution"):
+            st.markdown(f"""
+            To find angle B when {practice_trig_function}(B) = {practice_trig_value}:
+            
+            **Step 1:** Use the inverse {practice_trig_function} function: B = {practice_trig_function}^(-1)({practice_trig_value})
+            
+            **Step 2:** Calculate using calculator: B = {practice_angle}°
+            
+            On most scientific calculators, press the `{practice_trig_function}^(-1)` button followed by {practice_trig_value}
+            """)
+
+answer3 = st.text_input("Your answer for angle A (in degrees):", key="q3")
+
+# Improved AI tutor section for Question 3
+if st.checkbox("🤖 Ask an AI tutor for help with this question", key="q3_ai_toggle"):
+    st.info(f"You can ask questions like 'How do I find an angle from its {st.session_state.trig_function}?' or 'What buttons do I press on my calculator?'")
+    q3_ai_input = st.text_area("What would you like to ask about Question 3?", key="q3_ai_text")
+    
+    if st.button("Ask AI about Question 3"):
+        if q3_ai_input.strip():
+            with st.spinner("Asking AI tutor for help..."):
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a helpful math tutor for a Grade 10 student. Provide clear, step-by-step guidance without giving away the complete answer. Use encouraging language and scaffold your explanation so the student understands the process. Keep explanations under 150 words, use simple language, and focus on building understanding rather than just the solution."
+                        },
+                        {
+                            "role": "user",
+                            "content": f"I'm trying to find the angle A in degrees when {st.session_state.trig_function}(A) = {st.session_state.trig_value}. {q3_ai_input}"
+                        }
+                    ]
+                )
+                # Store AI response in session state
+                st.session_state.q3_ai_response = response.choices[0].message.content
+            
+            # Display the response from session state in a nicer format
+            st.markdown("### 👨‍🏫 AI
